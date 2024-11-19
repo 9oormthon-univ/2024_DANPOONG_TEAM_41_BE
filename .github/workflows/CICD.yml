@@ -46,7 +46,7 @@ jobs:
           cloud.aws.credentials.access-key=${{ secrets.ACCESS_KEY }}
           cloud.aws.credentials.secret-key=${{ secrets.SECRET_KEY }}
           cloud.aws.region.static=ap-northeast-2
-          cloud.aws.s3.bucket=team7buckets
+          cloud.aws.s3.bucket=allgoing-bucket
           EOT
         shell: bash
 
