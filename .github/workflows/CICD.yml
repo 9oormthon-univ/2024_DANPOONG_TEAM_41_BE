@@ -43,6 +43,10 @@ jobs:
           spring.jpa.properties.hibernate.format_sql=true
           spring.jpa.hibernate.ddl-auto=update
           app.cors.allowed-origins=${{ secrets.ALLOWED_ORIGINS }}
+          cloud.aws.credentials.access-key=${{ secrets.ACCESS_KEY }}
+          cloud.aws.credentials.secret-key=${{ secrets.SECRET_KEY }}
+          cloud.aws.region.static=ap-northeast-2
+          cloud.aws.s3.bucket=team7buckets
           EOT
         shell: bash
 
