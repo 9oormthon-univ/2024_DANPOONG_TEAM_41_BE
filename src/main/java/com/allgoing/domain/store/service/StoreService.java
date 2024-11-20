@@ -1,8 +1,11 @@
 package com.allgoing.domain.store.service;
 
+import com.allgoing.domain.review.domain.Review;
+import com.allgoing.domain.review.domain.ReviewImage;
 import com.allgoing.domain.store.controller.response.StoreListResponse;
 import com.allgoing.domain.store.controller.response.StoreSummaryResponse;
 import com.allgoing.domain.store.domain.Store;
+import com.allgoing.domain.store.domain.StoreImage;
 import com.allgoing.domain.store.repository.StoreRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -35,12 +38,39 @@ public class StoreService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));
 
-        return new StoreSummaryResponse(
-                store.getStoreName(),
-                store.getStoreIntro(),
-                store.getStoreAddress(),
-                store.getStoreInfos(),
-                store.getStoreReviews().size()
-        );
+        StoreSummaryResponse storeSummaryResponse = StoreSummaryResponse.builder()
+                .storeName(store.getStoreName())
+                .storeAddress(store.getStoreAddress())
+                .storeInfos(store.getStoreInfos())
+                .storeIntro(store.getStoreIntro())
+                .reviewCount(store.getStoreReviews().size())
+                .storeImageUrl(getImageUrl(store))
+                .build();
+
+        return storeSummaryResponse;
     }
+
+
+    private String getImageUrl(Store store) {
+        // 1. 가게 이미지가 있는 경우
+        List<StoreImage> storeImages = store.getStoreImages();
+        if (!storeImages.isEmpty()) {
+            return storeImages.get(0).getStoreImageUrl(); // 첫 번째 가게 이미지 반환
+        }
+
+        // 2. 가게 이미지가 없고 리뷰 이미지가 있는 경우
+        List<Review> storeReviews = store.getStoreReviews();
+        if (!storeReviews.isEmpty()) {
+            for (Review review : storeReviews) {
+                List<ReviewImage> reviewImages = review.getReviewImages();
+                if (!reviewImages.isEmpty()) {
+                    return reviewImages.get(0).getReviewImageUrl(); // 첫 번째 리뷰 이미지 반환
+                }
+            }
+        }
+
+        // 3. 가게 이미지도, 리뷰 이미지도 없는 경우
+        return null;
+    }
+
 }
