@@ -41,9 +41,6 @@ public class Store {
     @Column(name="store_phone")
     private String storePhone;
 
-    @Column(name="store_image_url")
-    private String storeImageUrl;
-
     // 가게 소식
     @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
     private List<StoreNotice> storeNotices = new ArrayList<>();
