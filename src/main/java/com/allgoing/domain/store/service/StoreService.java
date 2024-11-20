@@ -49,7 +49,13 @@ public class StoreService {
                 .storeId(store.getStoreId())
                 .storeName(store.getStoreName())
                 .storeAddress(store.getStoreAddress())
-                .storeInfos(store.getStoreInfos())
+                .storeInfos(store.getStoreInfos().stream()
+                        .map(storeInfo -> StoreInfoDto.builder()
+                                .day(storeInfo.getDay())
+                                .isOpen(storeInfo.isOpen())
+                                .openTime(storeInfo.getOpenTime())
+                                .closeTime(storeInfo.getCloseTime())
+                                .build()).toList())
                 .storeIntro(store.getStoreIntro())
                 .reviewCount(store.getStoreReviews().size())
                 .storeImageUrl(getImageUrl(store))
@@ -132,6 +138,7 @@ public class StoreService {
                                         .reviewImageUrl(image.getReviewImageUrl())
                                         .build())
                                 .toList())
+                        .createdAt(review.getCreatedAt())
                         .build())
                 .toList();
         return storeReviewList;

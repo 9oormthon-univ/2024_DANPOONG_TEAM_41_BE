@@ -1,6 +1,7 @@
 package com.allgoing.domain.review.dto.response;
 
 import com.allgoing.domain.review.dto.ReviewImageDto;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +19,7 @@ public class StoreReviewResponse {
     private int likeCount;
     private String writerName;
     private int commentCount;
+    private LocalDateTime createdAt;
 
     private List<ReviewImageDto> reviewImages;
 }

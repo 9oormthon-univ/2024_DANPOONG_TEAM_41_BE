@@ -1,5 +1,6 @@
 package com.allgoing.domain.store.dto.response;
 import com.allgoing.domain.store.domain.StoreInfo;
+import com.allgoing.domain.store.dto.StoreInfoDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +16,6 @@ public class StoreSummaryResponse {
     private String storeIntro;
     private String storeAddress;
     private String storeImageUrl;
-    private List<StoreInfo> storeInfos;
+    private List<StoreInfoDto> storeInfos;
     private long reviewCount;
 }
