@@ -75,4 +75,13 @@ public class ErrorResponse {
         }
     }
 
+    public static ErrorResponse of(final ErrorCode code, final String message) {
+        return ErrorResponse.builder()
+                .code(code.getCode())
+                .message(code.getMessage())
+                .build();
+    }
+
+
+
 }
