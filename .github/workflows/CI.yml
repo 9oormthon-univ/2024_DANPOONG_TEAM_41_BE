@@ -1,0 +1,76 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - develop
+
+jobs:
+  build:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup MySQL
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql database: 'testDB'
+          mysql user: 'test'
+          mysql password: 'testPW'
+
+      - name: Create application.properties
+        run: |
+          cat <<EOT > ./src/main/resources/application.properties
+          commit.hash=${{ steps.slug.outputs.sha7 }}
+          api.server.url=${{ secrets.API_URL }}
+          spring.datasource.url=${{ secrets.DB_URL }}
+          spring.datasource.username=${{ secrets.DB_USERNAME }}
+          spring.datasource.password=${{ secrets.DB_PASSWORD }}
+          spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+          spring.jpa.properties.hibernate.show_sql=true
+          spring.jpa.properties.hibernate.format_sql=true
+          spring.jpa.hibernate.ddl-auto=update
+          app.cors.allowed-origins=${{ secrets.ALLOWED_ORIGINS }}
+          cloud.aws.credentials.access-key=${{ secrets.ACCESS_KEY }}
+          cloud.aws.credentials.secret-key=${{ secrets.SECRET_KEY }}
+          cloud.aws.region.static=ap-northeast-2
+          cloud.aws.s3.bucket=allgoing-bucket
+          EOT
+        shell: bash
+
+      - name: Append to test application.properties
+        run: |
+          echo "" >> ./src/test/resources/application.properties
+          echo "cloud.aws.credentials.access-key=${{ secrets.ACCESS_KEY }}" >> ./src/test/resources/application.properties
+          echo "cloud.aws.credentials.secret-key=${{ secrets.SECRET_KEY }}" >> ./src/test/resources/application.properties
+          echo "cloud.aws.region.static=ap-northeast-2" >> ./src/test/resources/application.properties
+          echo "cloud.aws.s3.bucket=allgoing-bucket" >> ./src/test/resources/application.properties
+        shell: bash
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v 3.1.0
+
+      - name: Get short SHA
+        id: slug
+        run: echo "sha7=$(echo ${GITHUB_SHA} | cut -c1-7)" >> $GITHUB_OUTPUT
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Run Spotless Apply
+        run: ./gradlew spotlessApply
+
+      - name: Build with Gradle Wrapper
+        run: ./gradlew build
