@@ -1,4 +1,4 @@
-package com.allgoing.domain.store.controller.response;
+package com.allgoing.domain.store.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

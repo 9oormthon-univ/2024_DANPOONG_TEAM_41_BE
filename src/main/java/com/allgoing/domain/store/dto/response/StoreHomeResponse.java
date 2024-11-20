@@ -1,4 +1,4 @@
-package com.allgoing.domain.store.controller.response;
+package com.allgoing.domain.store.dto.response;
 
 import com.allgoing.domain.product.dto.ProductDto;
 import com.allgoing.domain.store.dto.StoreImageDto;

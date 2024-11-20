@@ -3,10 +3,12 @@ package com.allgoing.domain.store.service;
 import com.allgoing.domain.product.dto.ProductDto;
 import com.allgoing.domain.review.domain.Review;
 import com.allgoing.domain.review.domain.ReviewImage;
-import com.allgoing.domain.store.controller.response.StoreHomeResponse;
-import com.allgoing.domain.store.controller.response.StoreListResponse;
-import com.allgoing.domain.store.controller.response.StoreNoticeResponse;
-import com.allgoing.domain.store.controller.response.StoreSummaryResponse;
+import com.allgoing.domain.review.dto.ReviewImageDto;
+import com.allgoing.domain.review.dto.response.StoreReviewResponse;
+import com.allgoing.domain.store.dto.response.StoreHomeResponse;
+import com.allgoing.domain.store.dto.response.StoreListResponse;
+import com.allgoing.domain.store.dto.response.StoreNoticeResponse;
+import com.allgoing.domain.store.dto.response.StoreSummaryResponse;
 import com.allgoing.domain.store.domain.Store;
 import com.allgoing.domain.store.domain.StoreImage;
 import com.allgoing.domain.store.dto.StoreImageDto;
@@ -14,7 +16,6 @@ import com.allgoing.domain.store.dto.StoreInfoDto;
 import com.allgoing.domain.store.repository.StoreRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -111,6 +112,33 @@ public class StoreService {
         return storeNoticeList;
     }
 
+    public List<StoreReviewResponse> getStoreReview(Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));
+        List<StoreReviewResponse> storeReviewList = store.getStoreReviews().stream()
+                .map(review -> StoreReviewResponse.builder()
+                        .reviewId(review.getReviewId())
+                        .storeId(review.getStore().getStoreId())
+                        .userId(review.getUser().getUserId())
+                        .reviewTitle(review.getReviewTitle())
+                        .reviewContent(review.getReviewContent())
+                        .likeCount(review.getLikeCount())
+                        .writerName(review.getWriterName())
+                        .commentCount(review.getReviewComments().size())
+                        .reviewImages(review.getReviewImages().stream()
+                                .map(image -> ReviewImageDto.builder()
+                                        .reviewImageId(image.getReviewImageId())
+                                        .reviewId(review.getReviewId())
+                                        .reviewImageUrl(image.getReviewImageUrl())
+                                        .build())
+                                .toList())
+                        .build())
+                .toList();
+        return storeReviewList;
+    }
+
+
+
 
 
 
@@ -137,4 +165,6 @@ public class StoreService {
         // 3. 가게 이미지도, 리뷰 이미지도 없는 경우
         return null;
     }
+
+
 }

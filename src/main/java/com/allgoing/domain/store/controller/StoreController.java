@@ -1,9 +1,10 @@
 package com.allgoing.domain.store.controller;
 
-import com.allgoing.domain.store.controller.response.StoreHomeResponse;
-import com.allgoing.domain.store.controller.response.StoreNoticeResponse;
-import com.allgoing.domain.store.controller.response.StoreSummaryResponse;
-import com.allgoing.domain.store.controller.response.StoreListResponse;
+import com.allgoing.domain.review.dto.response.StoreReviewResponse;
+import com.allgoing.domain.store.dto.response.StoreHomeResponse;
+import com.allgoing.domain.store.dto.response.StoreNoticeResponse;
+import com.allgoing.domain.store.dto.response.StoreSummaryResponse;
+import com.allgoing.domain.store.dto.response.StoreListResponse;
 import com.allgoing.domain.store.service.StoreService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -60,6 +61,18 @@ public class StoreController {
         try {
             List<StoreNoticeResponse> storeNoticeList = storeService.getStoreNotice(storeId);
             return ResponseEntity.ok(storeNoticeList);
+        }catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    //가게 정보 리뷰 조회(홈에서 리뷰 버튼 클릭시)
+    @GetMapping("/review/{storeId}")
+    public ResponseEntity<List<StoreReviewResponse>> getStoreReview(@PathVariable Long storeId){
+        try {
+            List<StoreReviewResponse> storeReviewList = storeService.getStoreReview(storeId);
+            return ResponseEntity.ok(storeReviewList);
         }catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
