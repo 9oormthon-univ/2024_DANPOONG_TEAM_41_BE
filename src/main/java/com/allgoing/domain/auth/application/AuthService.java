@@ -1,0 +1,101 @@
+package com.allgoing.domain.auth.application;
+
+
+import com.allgoing.domain.auth.domain.Token;
+import com.allgoing.domain.auth.domain.repository.TokenRepository;
+import com.allgoing.domain.auth.dto.response.LoginResponse;
+import com.allgoing.domain.user.domain.Provider;
+import com.allgoing.domain.user.domain.User;
+import com.allgoing.domain.user.domain.repository.UserRepository;
+import com.allgoing.global.config.security.token.UserPrincipal;
+import com.allgoing.global.config.security.util.JwtTokenUtil;
+import com.allgoing.global.payload.ApiResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.Optional;
+
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class AuthService {
+
+    private final IdTokenVerifier idTokenVerifier;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final UserDetailsService userDetailsService;
+    private final TokenRepository tokenRepository;
+    private final UserRepository userRepository;
+
+    public String verifyIdTokenAndExtractUsername(String idToken, String email) {
+        if (idToken == null || idToken.trim().isEmpty()) {
+            throw new IllegalArgumentException("ID 토큰은 null이거나 비어 있을 수 없습니다");
+        }
+        return idTokenVerifier.verifyIdToken(idToken, email);
+    }
+
+    public ResponseEntity<?> loginWithIdToken(String idToken, String email) {
+        String username = verifyIdTokenAndExtractUsername(idToken, email);
+        if (username != null) {
+            String accessToken = jwtTokenUtil.generateToken(new HashMap<>(), username);
+            String refreshToken = jwtTokenUtil.generateRefreshToken(new HashMap<>(), username);
+
+            // Refresh token을 DB에 저장
+            Token tokenEntity = Token.builder()
+                    .email(email)
+                    .refreshToken(refreshToken)
+                    .build();
+            tokenRepository.save(tokenEntity);
+
+            // 사용자 정보를 DB에 저장
+            Optional<User> existingUser = userRepository.findByEmail(email);
+            if (existingUser.isEmpty()) {
+                User user = User.builder()
+                        .name(username)
+                        .email(email)
+                        .password(null)
+                        .provider(Provider.kakao)
+                        .profileImage(null)
+                        .build();
+                userRepository.save(user);
+            }
+
+            LoginResponse loginResponse = LoginResponse.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .build();
+
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .check(true)
+                    .information(loginResponse)
+                    .build();
+
+            return ResponseEntity.ok(apiResponse);
+
+        } else {
+            throw new RuntimeException("유효하지 않은 ID 토큰");
+        }
+    }
+
+    public ResponseEntity<?> logout(UserPrincipal userPrincipal) {
+        User user = (User) userDetailsService.loadUserByUsername(userPrincipal.getUsername());
+        String email = user.getEmail();
+
+        // 토큰 정보 삭제
+        Token token = tokenRepository.findByEmail(email);
+        if (token != null) {
+            tokenRepository.delete(token);
+        }
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information("로그아웃 성공")
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+}
