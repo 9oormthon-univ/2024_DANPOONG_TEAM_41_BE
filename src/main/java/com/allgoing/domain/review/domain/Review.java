@@ -1,6 +1,7 @@
 package com.allgoing.domain.review.domain;
 
 import com.allgoing.domain.common.BaseEntity;
+import com.allgoing.domain.store.domain.Store;
 import com.allgoing.domain.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -42,14 +43,17 @@ public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
     private List<ReviewComment> reviewComments = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
+    private Store store;
+
     @Builder
-    public Review(User user, String reviewTitle, String reviewContent){
+    public Review(User user, String reviewTitle, String reviewContent, int likeCount, String writerName, Store store) {
         this.user = user;
         this.reviewTitle = reviewTitle;
         this.reviewContent = reviewContent;
-        this.likeCount = 0;
-        this.writerName = user.getName();
+        this.likeCount = likeCount;
+        this.writerName = writerName;
+        this.store = store;
     }
-
-
 }
