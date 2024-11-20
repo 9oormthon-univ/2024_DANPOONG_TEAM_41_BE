@@ -1,11 +1,15 @@
 package com.allgoing.domain.store.service;
 
+import com.allgoing.domain.product.dto.ProductDto;
 import com.allgoing.domain.review.domain.Review;
 import com.allgoing.domain.review.domain.ReviewImage;
+import com.allgoing.domain.store.controller.response.StoreHomeResponse;
 import com.allgoing.domain.store.controller.response.StoreListResponse;
 import com.allgoing.domain.store.controller.response.StoreSummaryResponse;
 import com.allgoing.domain.store.domain.Store;
 import com.allgoing.domain.store.domain.StoreImage;
+import com.allgoing.domain.store.dto.StoreImageDto;
+import com.allgoing.domain.store.dto.StoreInfoDto;
 import com.allgoing.domain.store.repository.StoreRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -39,6 +43,7 @@ public class StoreService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));
 
         StoreSummaryResponse storeSummaryResponse = StoreSummaryResponse.builder()
+                .storeId(store.getStoreId())
                 .storeName(store.getStoreName())
                 .storeAddress(store.getStoreAddress())
                 .storeInfos(store.getStoreInfos())
@@ -49,6 +54,51 @@ public class StoreService {
 
         return storeSummaryResponse;
     }
+
+    public StoreHomeResponse getStoreHome(Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));
+
+        List<ProductDto> productDtos = store.getProducts().stream()
+                .map(product -> ProductDto.builder()
+                        .productId(product.getProductId())
+                        .productName(product.getProductName())
+                        .productPrice(product.getProductPrice())
+                        .productImageUrl(product.getProductImageUrl())
+                        .build())
+                .toList();
+
+        List<StoreImageDto> storeImageDtos = store.getStoreImages().stream()
+                .map(storeImage -> StoreImageDto.builder()
+                        .storeImageUrl(storeImage.getStoreImageUrl())
+                        .storeImageType(storeImage.getStoreImageType()) // StoreImageType 추가
+                        .build())
+                .toList();
+
+        List<StoreInfoDto> storeInfoDtos = store.getStoreInfos().stream()
+                .map(storeInfo -> StoreInfoDto.builder()
+                        .day(storeInfo.getDay())
+                        .isOpen(storeInfo.isOpen())
+                        .openTime(storeInfo.getOpenTime())
+                        .closeTime(storeInfo.getCloseTime())
+                        .build())
+                .toList();
+
+        return StoreHomeResponse.builder()
+                .storeId(store.getStoreId())
+                .storeName(store.getStoreName())
+                .storeIntro(store.getStoreIntro())
+                .storeAddress(store.getStoreAddress())
+                .storePhone(store.getStorePhone())
+                .products(productDtos)
+                .storeImages(storeImageDtos)
+                .storeInfos(storeInfoDtos)
+                .build();
+    }
+
+
+
+
 
 
     private String getImageUrl(Store store) {
@@ -72,5 +122,6 @@ public class StoreService {
         // 3. 가게 이미지도, 리뷰 이미지도 없는 경우
         return null;
     }
+
 
 }

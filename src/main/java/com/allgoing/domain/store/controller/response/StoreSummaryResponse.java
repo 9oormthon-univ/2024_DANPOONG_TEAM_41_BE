@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class StoreSummaryResponse {
+    private Long storeId;
     private String storeName;
     private String storeIntro;
     private String storeAddress;

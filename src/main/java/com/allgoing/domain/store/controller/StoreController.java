@@ -1,5 +1,6 @@
 package com.allgoing.domain.store.controller;
 
+import com.allgoing.domain.store.controller.response.StoreHomeResponse;
 import com.allgoing.domain.store.controller.response.StoreSummaryResponse;
 import com.allgoing.domain.store.controller.response.StoreListResponse;
 import com.allgoing.domain.store.service.StoreService;
@@ -35,6 +36,10 @@ public class StoreController {
         return ResponseEntity.ok(storeSummaryResponse);
     }
     
-    //가게 정보 전체 상세 조회(핀 클릭 후 가게명 클릭시)
-
+    //가게 정보 홈 조회(핀 클릭 후 가게명 클릭시)
+    @GetMapping("/home/{storeId}")
+    public ResponseEntity<StoreHomeResponse> getStoreDetail(@PathVariable Long storeId){
+        StoreHomeResponse storeHomeResponse = storeService.getStoreHome(storeId);
+        return ResponseEntity.ok(storeHomeResponse);
+    }
 }
