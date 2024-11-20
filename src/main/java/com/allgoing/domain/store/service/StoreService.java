@@ -1,17 +1,11 @@
 package com.allgoing.domain.store.service;
 
-<<<<<<< HEAD
 import com.allgoing.domain.review.domain.Review;
 import com.allgoing.domain.review.domain.ReviewImage;
 import com.allgoing.domain.store.controller.response.StoreListResponse;
 import com.allgoing.domain.store.controller.response.StoreSummaryResponse;
 import com.allgoing.domain.store.domain.Store;
 import com.allgoing.domain.store.domain.StoreImage;
-=======
-import com.allgoing.domain.store.controller.response.StoreListResponse;
-import com.allgoing.domain.store.controller.response.StoreSummaryResponse;
-import com.allgoing.domain.store.domain.Store;
->>>>>>> 1dcdc9e3a1bb7513b40e94d923e40772c1a2c0cb
 import com.allgoing.domain.store.repository.StoreRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -44,7 +38,6 @@ public class StoreService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));
 
-<<<<<<< HEAD
         StoreSummaryResponse storeSummaryResponse = StoreSummaryResponse.builder()
                 .storeName(store.getStoreName())
                 .storeAddress(store.getStoreAddress())
@@ -80,14 +73,4 @@ public class StoreService {
         return null;
     }
 
-=======
-        return new StoreSummaryResponse(
-                store.getStoreName(),
-                store.getStoreIntro(),
-                store.getStoreAddress(),
-                store.getStoreInfos(),
-                store.getStoreReviews().size()
-        );
-    }
->>>>>>> 1dcdc9e3a1bb7513b40e94d923e40772c1a2c0cb
 }
