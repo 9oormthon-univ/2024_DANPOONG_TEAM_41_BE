@@ -5,6 +5,7 @@ import com.allgoing.domain.review.domain.Review;
 import com.allgoing.domain.review.domain.ReviewImage;
 import com.allgoing.domain.store.controller.response.StoreHomeResponse;
 import com.allgoing.domain.store.controller.response.StoreListResponse;
+import com.allgoing.domain.store.controller.response.StoreNoticeResponse;
 import com.allgoing.domain.store.controller.response.StoreSummaryResponse;
 import com.allgoing.domain.store.domain.Store;
 import com.allgoing.domain.store.domain.StoreImage;
@@ -13,6 +14,7 @@ import com.allgoing.domain.store.dto.StoreInfoDto;
 import com.allgoing.domain.store.repository.StoreRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -96,6 +98,19 @@ public class StoreService {
                 .build();
     }
 
+    public List<StoreNoticeResponse> getStoreNotice(Long storeId){
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));
+        List<StoreNoticeResponse> storeNoticeList = store.getStoreNotices().stream()
+                .map(notice -> StoreNoticeResponse.builder()
+                        .storeNoticeContent(notice.getStoreNoticeContent())
+                        .storeId(notice.getStore().getStoreId())
+                        .createdAt(notice.getCreatedAt())
+                        .build())
+                .toList();
+        return storeNoticeList;
+    }
+
 
 
 
@@ -122,6 +137,4 @@ public class StoreService {
         // 3. 가게 이미지도, 리뷰 이미지도 없는 경우
         return null;
     }
-
-
 }

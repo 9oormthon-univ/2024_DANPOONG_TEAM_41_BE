@@ -1,6 +1,7 @@
 package com.allgoing.domain.store.controller;
 
 import com.allgoing.domain.store.controller.response.StoreHomeResponse;
+import com.allgoing.domain.store.controller.response.StoreNoticeResponse;
 import com.allgoing.domain.store.controller.response.StoreSummaryResponse;
 import com.allgoing.domain.store.controller.response.StoreListResponse;
 import com.allgoing.domain.store.service.StoreService;
@@ -32,14 +33,36 @@ public class StoreController {
     //가게 정보 간단 조회(지도 위의 핀 클릭시)
     @GetMapping("/summary/{storeId}")
     public ResponseEntity<StoreSummaryResponse> getStoreSummary(@PathVariable Long storeId) {
-        StoreSummaryResponse storeSummaryResponse = storeService.getStoreSummary(storeId);
-        return ResponseEntity.ok(storeSummaryResponse);
+        try {
+            StoreSummaryResponse storeSummary = storeService.getStoreSummary(storeId);
+            return ResponseEntity.ok(storeSummary);
+        }catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
     }
     
     //가게 정보 홈 조회(핀 클릭 후 가게명 클릭시)
     @GetMapping("/home/{storeId}")
-    public ResponseEntity<StoreHomeResponse> getStoreDetail(@PathVariable Long storeId){
-        StoreHomeResponse storeHomeResponse = storeService.getStoreHome(storeId);
-        return ResponseEntity.ok(storeHomeResponse);
+    public ResponseEntity<StoreHomeResponse> getStoreHome(@PathVariable Long storeId){
+        try {
+            StoreHomeResponse storeHomeResponse = storeService.getStoreHome(storeId);
+            return ResponseEntity.ok(storeHomeResponse);
+        }catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    //가게 정보 소식 조회(홈에서 소식 버튼 클릭시)
+    @GetMapping("/notice/{storeId}")
+    public ResponseEntity<List<StoreNoticeResponse>> getStoreNotice(@PathVariable Long storeId) {
+        try {
+            List<StoreNoticeResponse> storeNoticeList = storeService.getStoreNotice(storeId);
+            return ResponseEntity.ok(storeNoticeList);
+        }catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
     }
 }
