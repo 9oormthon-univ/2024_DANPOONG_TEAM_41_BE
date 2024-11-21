@@ -47,9 +47,6 @@ public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
     private List<ReviewComment> reviewComments = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
-    private Store store;
 
     @Builder
     public Review(User user, String reviewTitle, String reviewContent, int likeCount, String writerName, Store store) {
