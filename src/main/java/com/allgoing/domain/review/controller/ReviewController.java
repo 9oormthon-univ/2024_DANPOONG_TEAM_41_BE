@@ -36,7 +36,7 @@ public class ReviewController {
     private final UserRepository userRepository;
 
     //리뷰 작성
-    @PostMapping("/creat/{storeId}")
+    @PostMapping("/create/{storeId}")
     public ResponseEntity<?> createReview(@PathVariable Long storeId,
                                           @Validated @RequestPart(value = "review") ReviewRequestDto.Review review,
                                           @RequestPart(value = "files", required = false) List<MultipartFile> files,

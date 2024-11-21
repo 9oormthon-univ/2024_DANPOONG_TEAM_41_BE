@@ -65,7 +65,13 @@ public class ReviewService {
         if(!review.getUser().equals(user)) {
             throw new DefaultException(ErrorCode.INVALID_AUTHENTICATION, "리뷰 작성자만 삭제 가능합니다");
         }
-
+        List<ReviewImage> reviewImages = review.getReviewImages();
+        if(!reviewImages.isEmpty()) {
+            for (ReviewImage reviewImage : reviewImages) {
+                System.out.println(reviewImage.getReviewImageUrl());
+                s3Util.deleteFile(reviewImage.getReviewImageUrl());
+            }
+        }
         reviewRepository.delete(review);
     }
 }
