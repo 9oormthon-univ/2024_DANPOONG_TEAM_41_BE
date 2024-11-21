@@ -37,6 +37,10 @@ public class Review extends BaseEntity {
     @Column(name="writer_name")
     private String writerName;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id", nullable = false) // Store와 연결
+    private Store store; // Store 필드 추가
+
     @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
