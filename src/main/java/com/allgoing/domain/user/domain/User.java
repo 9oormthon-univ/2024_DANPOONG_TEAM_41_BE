@@ -34,14 +34,14 @@ public class User extends BaseEntity {
     @Column(name="password")
     private String password;
 
-//    @Enumerated(EnumType.STRING)
-//    private Provider provider;
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
 
     @Column(name="profile_image")
     private String profileImage;
 
     @Enumerated(EnumType.STRING)
-    private Role role = Role.USER;
+    private Role role;
 
     @OneToMany(mappedBy = "user")
     private List<Review> reviews = new ArrayList<>();
@@ -59,10 +59,11 @@ public class User extends BaseEntity {
     private List<Reservation> reservations = new ArrayList<>();
 
     @Builder
-    public User(String name, String email, String password, String profileImage, Role role){
+    public User(String name, String email, String password, Provider provider, String profileImage) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.provider = provider;
         this.profileImage = profileImage;
         this.role = Role.USER;
     }
