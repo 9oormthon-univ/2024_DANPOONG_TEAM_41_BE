@@ -51,12 +51,13 @@ public class Review extends BaseEntity {
     private List<ReviewLike> reviewLikes = new ArrayList<>();
 
     @Builder
-    public Review(User user, String reviewTitle, String reviewContent){
+    public Review(User user, String reviewTitle, String reviewContent, Store store){
         this.user = user;
         this.reviewTitle = reviewTitle;
         this.reviewContent = reviewContent;
         this.likeCount = 0;
         this.writerName = user.getName();
+        this.store = store;
     }
 
     public void incrementLikeCount() {
@@ -66,5 +67,4 @@ public class Review extends BaseEntity {
     public void decrementLikeCount() {
         this.likeCount--;
     }
-
 }

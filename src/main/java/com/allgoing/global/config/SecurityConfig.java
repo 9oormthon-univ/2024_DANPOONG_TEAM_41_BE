@@ -16,7 +16,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/health-check",
-                                "/store/**").permitAll()
+                                "/store/**",
+                                "/review/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable()); // CSRF 비활성화
