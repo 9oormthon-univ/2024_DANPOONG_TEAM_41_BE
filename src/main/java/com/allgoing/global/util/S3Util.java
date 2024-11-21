@@ -26,13 +26,13 @@ public class S3Util {
 
 	private final AmazonS3 s3Client;
 
-	@Value("${cloud.aws.credentials.access-key}")
+	@Value("${cloud.aws.credentials.accessKey}")
 	private String accessKey;
 
-	@Value("${cloud.aws.credentials.secret-key}")
+	@Value("${cloud.aws.credentials.secretKey}")
 	private String secretKey;
 
-	@Value("${cloud.aws.s3.bucket}")
+	@Value("${cloud.aws.s3.bucketName}")
 	private String bucket;
 
 	@Value("${cloud.aws.region.static}")

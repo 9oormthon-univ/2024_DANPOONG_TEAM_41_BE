@@ -37,6 +37,8 @@ public class ReviewService {
                 .reviewTitle(review.getReviewTitle())
                 .reviewContent(review.getReviewContent())
                 .store(store)
+                .likeCount(0)
+                .writerName(user.getName())
                 .build();
 
         reviewRepository.save(newReview);
@@ -74,5 +76,8 @@ public class ReviewService {
         }
         reviewRepository.delete(review);
     }
+
+//    public List<Revie> allReiews() {
+//    }
 }
 

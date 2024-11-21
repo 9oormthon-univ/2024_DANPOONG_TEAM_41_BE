@@ -5,6 +5,7 @@ import com.allgoing.domain.review.dto.request.ReviewRequestDto;
 import com.allgoing.domain.review.service.ReviewService;
 import com.allgoing.domain.user.domain.User;
 import com.allgoing.domain.user.domain.repository.UserRepository;
+import com.allgoing.global.payload.ApiResponse;
 import com.allgoing.global.util.S3Util;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/review")
+@RequestMapping("/api/v1/review")
 public class ReviewController {
     private final ReviewService reviewService;
     private final S3Util s3Util;
@@ -68,5 +70,11 @@ public class ReviewController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+    }
+
+    //모든 리뷰 보기
+    @GetMapping("/all")
+    public ApiResponse getAllReviews() {
+        reviewService.allReiews();
     }
 }

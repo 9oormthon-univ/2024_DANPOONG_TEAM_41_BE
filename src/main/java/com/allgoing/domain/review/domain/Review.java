@@ -41,22 +41,20 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "store_id", nullable = false) // Store와 연결
     private Store store; // Store 필드 추가
 
-    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
     @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
     private List<ReviewComment> reviewComments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReviewLike> reviewLikes = new ArrayList<>();
 
     @Builder
-    public Review(User user, String reviewTitle, String reviewContent, Store store){
+    public Review(User user, String reviewTitle, String reviewContent, int likeCount, String writerName, Store store) {
         this.user = user;
         this.reviewTitle = reviewTitle;
         this.reviewContent = reviewContent;
-        this.likeCount = 0;
-        this.writerName = user.getName();
+        this.likeCount = likeCount;
+        this.writerName = writerName;
         this.store = store;
     }
 
