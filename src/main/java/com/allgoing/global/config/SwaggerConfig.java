@@ -10,8 +10,8 @@ import io.swagger.v3.oas.models.servers.Server;
 @Configuration
 public class SwaggerConfig {
 
-    // @Value("${api.server.url}")
-    private String serverUrl = "http://localhost:8080";
+    @Value("${api.server.url}")
+    private String serverUrl;
 
     @Bean
     public OpenAPI openAPI() {
