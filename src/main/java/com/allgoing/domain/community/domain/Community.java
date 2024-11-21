@@ -1,6 +1,7 @@
 package com.allgoing.domain.community.domain;
 
 import com.allgoing.domain.common.BaseEntity;
+import com.allgoing.domain.review.domain.ReviewLike;
 import com.allgoing.domain.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -41,6 +42,9 @@ public class Community extends BaseEntity {
 
     @OneToMany(mappedBy = "community", fetch = FetchType.LAZY)
     private List<CommunityComment> communityComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommunityLike> communityLikes = new ArrayList<>();
 
 
     @Builder

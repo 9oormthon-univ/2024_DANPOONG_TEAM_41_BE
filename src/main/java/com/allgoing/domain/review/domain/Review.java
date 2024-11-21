@@ -47,6 +47,9 @@ public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
     private List<ReviewComment> reviewComments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewLike> reviewLikes = new ArrayList<>();
+
     @Builder
     public Review(User user, String reviewTitle, String reviewContent){
         this.user = user;
