@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +36,7 @@ public class ReviewController {
     private final UserRepository userRepository;
 
     //리뷰 작성
-    @PostMapping("/{storeId}")
+    @PostMapping("/creat/{storeId}")
     public ResponseEntity<?> createReview(@PathVariable Long storeId,
                                           @Validated @RequestPart(value = "review") ReviewRequestDto.Review review,
                                           @RequestPart(value = "files", required = false) List<MultipartFile> files,
@@ -53,6 +54,18 @@ public class ReviewController {
             return ResponseEntity.ok("Review created successfully");
         } catch (Exception e) {
             // 예외 처리
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    //리뷰 삭제
+    @DeleteMapping("/delete/{reviewId}")
+    public ResponseEntity<?> deleteReview(@PathVariable Long reviewId) {
+        User user = userRepository.getById(1L);
+        try {
+            reviewService.deleteReview(reviewId, user);
+            return ResponseEntity.ok("Review created successfully");
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }

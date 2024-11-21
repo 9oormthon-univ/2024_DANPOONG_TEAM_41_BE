@@ -8,6 +8,8 @@ import com.allgoing.domain.review.repository.ReviewRepository;
 import com.allgoing.domain.store.domain.Store;
 import com.allgoing.domain.store.repository.StoreRepository;
 import com.allgoing.domain.user.domain.User;
+import com.allgoing.global.error.DefaultException;
+import com.allgoing.global.payload.ErrorCode;
 import com.allgoing.global.util.S3Util;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -29,7 +31,7 @@ public class ReviewService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));
 
-        // 1. Review 엔티티 생성 및 저장
+        //Review 엔티티 생성 및 저장
         Review newReview = Review.builder()
                 .user(user)
                 .reviewTitle(review.getReviewTitle())
@@ -39,26 +41,32 @@ public class ReviewService {
 
         reviewRepository.save(newReview);
 
-        // 2. 이미지 파일 처리 및 S3 업로드
+        //이미지 파일 처리 및 S3 업로드
         if (files != null && !files.isEmpty()) {
             for (MultipartFile file : files) {
                 String imageUrl = s3Util.upload(file);
-                // ReviewImage 엔티티 생성
+
                 ReviewImage reviewImage = ReviewImage.builder()
                         .review(newReview)
                         .reviewImageUrl(imageUrl)
                         .build();
 
-                // Review 엔티티에 이미지 추가
-                //newReview.getReviewImages().add(reviewImage);
                 reviewImageRepository.save(reviewImage);
             }
-        }else {
-            System.out.println("sadfsadfsadf");
         }
 
-        // 저장된 Review 엔티티에 이미지가 추가된 상태로 다시 저장
         reviewRepository.save(newReview);
+    }
+
+    public void deleteReview(Long reviewId, User user) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 리뷰 없음 id: " + reviewId));
+
+        if(!review.getUser().equals(user)) {
+            throw new DefaultException(ErrorCode.INVALID_AUTHENTICATION, "리뷰 작성자만 삭제 가능합니다");
+        }
+
+        reviewRepository.delete(review);
     }
 }
 
