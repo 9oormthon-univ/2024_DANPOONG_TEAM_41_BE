@@ -3,6 +3,7 @@ package com.allgoing.domain.store.domain;
 import com.allgoing.domain.product.domain.Product;
 import com.allgoing.domain.reservation.domain.Reservation;
 import com.allgoing.domain.review.domain.Review;
+import com.allgoing.domain.traditional.domain.Traditional;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,6 +44,10 @@ public class Store {
 
     @Column(name="store_image_url")
     private String storeImageUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "traditional_id")
+    private Traditional traditional;
 
     // 가게 소식
     @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
