@@ -56,5 +56,12 @@ public class Review extends BaseEntity {
         this.writerName = user.getName();
     }
 
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decrementLikeCount() {
+        this.likeCount--;
+    }
 
 }

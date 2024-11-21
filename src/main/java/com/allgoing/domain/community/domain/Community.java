@@ -52,4 +52,12 @@ public class Community extends BaseEntity {
         this.writerName = user.getName();
     }
 
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decrementLikeCount() {
+        this.likeCount--;
+    }
+
 }
