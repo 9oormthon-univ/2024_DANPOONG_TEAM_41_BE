@@ -77,7 +77,8 @@ public class ReviewService {
         reviewRepository.delete(review);
     }
 
-//    public List<Revie> allReiews() {
-//    }
+    public List<Review> allReiews() {
+        return reviewRepository.findAll();
+    }
 }
 

@@ -75,6 +75,7 @@ public class ReviewController {
     //모든 리뷰 보기
     @GetMapping("/all")
     public ApiResponse getAllReviews() {
-        reviewService.allReiews();
+        List<Review> reviews = reviewService.allReiews();
+        return ApiResponse.builder().check(true).information(reviews).build();
     }
 }
