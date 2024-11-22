@@ -42,24 +42,24 @@ jobs:
 
       - name: Create application-s3.yml
         env:
-         APP_PROPS: ${{ secrets.APP_S3_YML }}
+          APP_PROPS: ${{ secrets.APP_S3_YML }}
         run: |
-         mkdir -p src/main/resources/s3
-         echo "$APP_PROPS" > src/main/resources/s3/application-s3.yml
+          mkdir -p src/main/resources/s3
+          echo "$APP_PROPS" > src/main/resources/s3/application-s3.yml
 
       - name: Create application-oauth2.yml
         env:
-         APP_PROPS: ${{ secrets.APP_OAUTH2_YML }}
+          APP_PROPS: ${{ secrets.APP_OAUTH2_YML }}
         run: |
-         mkdir -p src/main/resources/oauth2
-         echo "$APP_PROPS" > src/main/resources/oauth2/application-oauth2.yml
+          mkdir -p src/main/resources/oauth2
+          echo "$APP_PROPS" > src/main/resources/oauth2/application-oauth2.yml
 
       - name: Create application-database.yml
         env:
-         APP_PROPS: ${{ secrets.APP_DB_YML }}
+          APP_PROPS: ${{ secrets.APP_DB_YML }}
         run: |
-         mkdir -p src/main/resources/database
-         echo "$APP_PROPS" > src/main/resources/database/application-database.yml
+          mkdir -p src/main/resources/database
+          echo "$APP_PROPS" > src/main/resources/database/application-database.yml
 
       # - name: Create application.properties
       #   run: |
