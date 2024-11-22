@@ -47,15 +47,13 @@ public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
     private List<ReviewComment> reviewComments = new ArrayList<>();
 
-
     @Builder
-    public Review(User user, String reviewTitle, String reviewContent, int likeCount, String writerName, Store store) {
+    public Review(User user, String reviewTitle, String reviewContent){
         this.user = user;
         this.reviewTitle = reviewTitle;
         this.reviewContent = reviewContent;
-        this.likeCount = likeCount;
-        this.writerName = writerName;
-        this.store = store;
+        this.likeCount = 0;
+        this.writerName = user.getName();
     }
 
     public void incrementLikeCount() {
