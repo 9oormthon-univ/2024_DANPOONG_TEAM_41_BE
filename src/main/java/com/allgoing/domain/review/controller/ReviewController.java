@@ -7,6 +7,7 @@ import com.allgoing.domain.review.service.ReviewService;
 import com.allgoing.domain.user.domain.repository.UserRepository;
 import com.allgoing.global.payload.ApiResponse;
 import com.allgoing.global.util.S3Util;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class ReviewController {
     private final UserRepository userRepository;
 
     //리뷰 작성
+    @Operation(summary = "리뷰 작성", description = "리뷰 작성 요청(로그인 기능 적용 전이므로 1번유저 고정)")
     @PostMapping("/create/{storeId}")
     public ResponseEntity<?> createReview(@PathVariable Long storeId,
                                           @Validated @RequestPart(value = "review") ReviewRequestDto.Review review,
@@ -60,6 +62,7 @@ public class ReviewController {
     }
 
     //리뷰 삭제
+    @Operation(summary = "리뷰 삭제", description = "리뷰 삭제 요청(로그인 기능 적용 전이므로 1번유저 고정)")
     @DeleteMapping("/delete/{reviewId}")
     public ResponseEntity<?> deleteReview(@PathVariable Long reviewId) {
 //        User user = userRepository.getById(1L);
@@ -72,6 +75,7 @@ public class ReviewController {
     }
 
     //리뷰 상세보기
+    @Operation(summary = "리뷰 상세보기", description = "리뷰 상세보기 요청")
     @GetMapping("/detail/{reviewId}")
     public ResponseEntity<?> detailReview(@PathVariable Long reviewId) {
         try {
@@ -83,6 +87,7 @@ public class ReviewController {
     }
 
     //시장에 따른 리뷰보기
+    @Operation(summary = "시장 전체 가게의 리뷰 보기", description = "시장 전체 가게의 리뷰 보기 요청")
     @GetMapping("/traditional/{traditionalId}")
     public ResponseEntity<?> traditionalReview(@PathVariable Long traditionalId) {
         try {
@@ -95,6 +100,7 @@ public class ReviewController {
 
     //내가 쓴 리뷰 보기
     //로그인 미적용 관계로 1번 유저의 리뷰를 가져옴
+    @Operation(summary = "내가 쓴 리뷰 보기", description = "내가 쓴 리뷰 보기(로그인 기능 적용 전이므로 1번유저 고정)")
     @GetMapping("/myreview")
     public ResponseEntity<?> myReview() {
         try {
@@ -107,6 +113,7 @@ public class ReviewController {
     }
 
     // 리뷰 좋아요
+    @Operation(summary = "리뷰 좋아요 하기", description = "리뷰 좋아요 요청(로그인 기능 적용 전이므로 1번유저 고정)")
     @PostMapping("/like/{reviewId}")
     public ResponseEntity<?> likeReview(@PathVariable Long reviewId) {
         try {
@@ -119,6 +126,7 @@ public class ReviewController {
     }
 
     // 리뷰 좋아요 취소
+    @Operation(summary = "리뷰 좋아요 취소", description = "리뷰 좋아요 취소(로그인 기능 적용 전이므로 1번유저 고정)")
     @DeleteMapping("/like/{reviewId}")
     public ResponseEntity<?> unlikeReview(@PathVariable Long reviewId) {
         try {
@@ -131,6 +139,7 @@ public class ReviewController {
     }
 
     //좋아요 한 리뷰 보기
+    @Operation(summary = "좋아요 한 리뷰 보기", description = "좋아요 한 리뷰 보기(로그인 기능 적용 전이므로 1번유저 고정)")
     @GetMapping("/like")
     public ResponseEntity<?> likeReview(){
         try {
@@ -144,10 +153,11 @@ public class ReviewController {
 
 
 
-    //모든 리뷰 보기
-    @GetMapping("/all")
-    public ApiResponse getAllReviews() {
-        List<Review> reviews = reviewService.allReiews();
-        return ApiResponse.builder().check(true).information(reviews).build();
-    }
+//    //모든 리뷰 보기
+//    @Operation(summary = "모든 리뷰 보기", description = "모든 리뷰 보기")
+//    @GetMapping("/all")
+//    public ApiResponse getAllReviews() {
+//        List<Review> reviews = reviewService.allReiews();
+//        return ApiResponse.builder().check(true).information(reviews).build();
+//    }
 }
