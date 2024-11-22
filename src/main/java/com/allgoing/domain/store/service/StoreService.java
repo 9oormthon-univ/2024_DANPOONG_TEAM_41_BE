@@ -133,7 +133,7 @@ public class StoreService {
                 .map(review -> StoreReviewResponse.builder()
                         .reviewId(review.getReviewId())
                         .storeId(review.getStore().getStoreId())
-                        .userId(review.getUser().getUserId())
+                        .userId(review.getUser().getId())
                         .reviewTitle(review.getReviewTitle())
                         .reviewContent(review.getReviewContent())
                         .likeCount(review.getLikeCount())

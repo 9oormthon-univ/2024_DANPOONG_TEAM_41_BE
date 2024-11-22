@@ -145,7 +145,7 @@ public class ReviewService {
                         .toList())
                 .storeId(review.getStore().getStoreId())
                 .likeCount(review.getLikeCount())
-                .userId(review.getUser().getUserId())
+                .userId(review.getUser().getId())
                 .writerName(review.getWriterName())
                 .liked(reviewLikeRepository.existsByReviewAndUser(review, user))
                 .createdAt(review.getCreatedAt())
@@ -172,7 +172,7 @@ public class ReviewService {
                             .storeId(store.getStoreId())
                             .likeCount(review.getLikeCount())
                             .writerName(review.getWriterName())
-                            .userId(review.getUser().getUserId())
+                            .userId(review.getUser().getId())
                             .liked(reviewLikeRepository.existsByReviewAndUser(review, user))
                             .createdAt(review.getCreatedAt())
                             .star(review.getStar())
@@ -193,7 +193,7 @@ public class ReviewService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
 
-        List<ReviewDto> ReviewDtoList = reviewRepository.findAllByUserUserId(userId).stream()
+        List<ReviewDto> ReviewDtoList = reviewRepository.findAllByUserId(userId).stream()
                 .map(review -> ReviewDto.builder()
                         .reviewTitle(review.getReviewTitle())
                         .reviewContent(review.getReviewContent())
@@ -201,7 +201,7 @@ public class ReviewService {
                         .storeId(review.getStore().getStoreId())
                         .likeCount(review.getLikeCount())
                         .writerName(review.getWriterName())
-                        .userId(review.getUser().getUserId())
+                        .userId(review.getUser().getId())
                         .liked(reviewLikeRepository.existsByReviewAndUser(review, user))
                         .createdAt(review.getCreatedAt())
                         .star(review.getStar())
@@ -265,7 +265,7 @@ public class ReviewService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
 
-        List<ReviewDto> allLikeReview = reviewLikeRepository.findAllByUserUserId(userId).stream()
+        List<ReviewDto> allLikeReview = reviewLikeRepository.findAllByUserId(userId).stream()
                 .map(reviewLike -> ReviewDto.builder()
                         .reviewTitle(reviewLike.getReview().getReviewTitle())
                         .reviewContent(reviewLike.getReview().getReviewContent())
@@ -273,7 +273,7 @@ public class ReviewService {
                         .likeCount(reviewLike.getReview().getLikeCount())
                         .writerName(reviewLike.getReview().getWriterName())
                         .storeId(reviewLike.getReview().getStore().getStoreId())
-                        .userId(reviewLike.getReview().getUser().getUserId())
+                        .userId(reviewLike.getReview().getUser().getId())
                         .liked(true)
                         .createdAt(reviewLike.getReview().getCreatedAt())
                         .star(reviewLike.getReview().getStar())

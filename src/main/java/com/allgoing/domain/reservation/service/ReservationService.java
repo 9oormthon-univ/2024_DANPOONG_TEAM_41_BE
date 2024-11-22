@@ -82,7 +82,7 @@ public class ReservationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 유저 없음: " + userId));
 
-        List<Reservation> reservations = reservationRepository.findAllByUserUserId(userId);
+        List<Reservation> reservations = reservationRepository.findAllByUserId(userId);
         List<ReservationResponse> responses = new ArrayList<>();
 
         for (Reservation reservation : reservations) {
