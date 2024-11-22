@@ -9,6 +9,7 @@ import com.allgoing.domain.item.domain.ItemCategory;
 import com.allgoing.domain.item.domain.repository.ItemRepository;
 import com.allgoing.domain.item.dto.response.CategoryItemListResponse;
 import com.allgoing.domain.item.dto.response.CategoryItemResponse;
+import com.allgoing.domain.item.dto.response.CoinResponse;
 import com.allgoing.global.config.security.token.UserPrincipal;
 import com.allgoing.global.payload.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -101,6 +102,23 @@ public class ItemService {
 
         return ResponseEntity.ok(response);
     }
+
+
+    public ResponseEntity<?> getCoinInfo(UserPrincipal userPrincipal) {
+        Cat cat = getCatbyUser(userPrincipal);
+
+        CoinResponse coinResponse = CoinResponse.builder()
+                .coin(cat.getCoin())
+                .build();
+
+        ApiResponse response = ApiResponse.builder()
+                .check(true)
+                .information(coinResponse)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
 
     private Cat getCatbyUser(UserPrincipal userPrincipal) {
         // User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));

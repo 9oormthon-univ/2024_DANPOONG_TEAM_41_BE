@@ -1,8 +1,9 @@
 package com.allgoing.domain.item.presentation;
 
-import com.allgoing.domain.cat.dto.response.ExpResponse;
+
 import com.allgoing.domain.item.application.ItemService;
 import com.allgoing.domain.item.dto.response.CategoryItemListResponse;
+import com.allgoing.domain.item.dto.response.CoinResponse;
 import com.allgoing.global.config.security.token.CurrentUser;
 import com.allgoing.global.config.security.token.UserPrincipal;
 import com.allgoing.global.payload.Message;
@@ -50,6 +51,19 @@ public class ItemController {
     ) {
         return itemService.buyItem(userPrincipal, itemId);
     }
+
+    @Operation(summary = "보유 코인 정보 조회 API", description = "보유 코인 정보를 조회하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "착용 아이템 수정 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = CoinResponse.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "착용 아이템 수정 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @GetMapping("/coin")
+    public ResponseEntity<?> getCoinInfo(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal
+    ) {
+        return itemService.getCoinInfo(userPrincipal);
+    }
+
 
 
 }
