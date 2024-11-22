@@ -1,5 +1,9 @@
 package com.allgoing.domain.reservation.service;
 
+import com.allgoing.domain.cat.application.CatService;
+import com.allgoing.domain.cat.domain.Cat;
+import com.allgoing.domain.cat.domain.repository.CatRepository;
+import com.allgoing.domain.cat.dto.response.ExpResponse;
 import com.allgoing.domain.product.domain.Product;
 import com.allgoing.domain.product.dto.ProductDto;
 import com.allgoing.domain.product.repository.ProductRepository;
@@ -29,6 +33,8 @@ public class ReservationService {
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final CatService catService;
+    private final CatRepository catRepository;
 
     @Transactional
     public void makeReservation(ReservationRequest reservationRequest, Long storeId, Long userId) {
@@ -124,7 +130,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public void visitReservation(Long reservationId, Long userId) {
+    public ExpResponse visitReservation(Long reservationId, Long userId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 예약 없음 id: " + reservationId));
 
@@ -133,6 +139,18 @@ public class ReservationService {
 
         reservation.setReservationStatus(ReservationStatus.DONE);
         reservationRepository.save(reservation);
+
+        //고양이 경험치 증가 로직
+        Cat cat = catRepository.findByUserId(userId).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+
+        catService.plusExp(cat, 3L);
+
+        ExpResponse catExp = ExpResponse.builder()
+                .catExp(cat.getCatExp())
+                .level(cat.getLevel())
+                .build();
+
+        return catExp;
     }
 
 

@@ -1,5 +1,8 @@
 package com.allgoing.domain.reservation.controller;
 
+import com.allgoing.domain.cat.application.CatService;
+import com.allgoing.domain.cat.domain.Cat;
+import com.allgoing.domain.cat.dto.response.ExpResponse;
 import com.allgoing.domain.product.dto.ProductDto;
 import com.allgoing.domain.reservation.dto.request.ReservationRequest;
 import com.allgoing.domain.reservation.dto.response.ReservationResponse;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/reservation")
 public class ReservationController {
     private final ReservationService reservationService;
+    private final CatService catService;
 
     //가게 예약내역 보기
     @Operation(summary = "가게 예약내역 보기", description = "이미 예약된 시간은 선택 못하도록")
@@ -123,11 +127,11 @@ public class ReservationController {
         try {
             //임시로 1번 유저 사용
 //            reservationService.makeReservation(storeId, userId);
-            reservationService.visitReservation(reservationId, 1L);
+            ExpResponse expResponse = reservationService.visitReservation(reservationId, 1L);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)
-                            .information("Reservation finished successfully")
+                            .information(expResponse)
                             .build()
             );
         } catch (Exception e) {
