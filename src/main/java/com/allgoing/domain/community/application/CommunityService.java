@@ -7,6 +7,7 @@ import com.allgoing.domain.community.domain.repository.CommunityImageRepository;
 import com.allgoing.domain.community.domain.repository.CommunityLikeRepository;
 import com.allgoing.domain.community.domain.repository.CommunityRepository;
 import com.allgoing.domain.community.dto.request.NewPostRequest;
+import com.allgoing.domain.community.dto.response.PostDetailResponse;
 import com.allgoing.domain.community.dto.response.PostListResponse;
 import com.allgoing.domain.user.domain.User;
 import com.allgoing.domain.user.domain.repository.UserRepository;
@@ -119,7 +120,39 @@ public class CommunityService {
         return communityImageRepository.findFirstByCommunity(community);
     }
 
+//
+//    public ResponseEntity<?> getPostDetail(UserPrincipal userPrincipal, Long postId) {
+//        User user = getUser(userPrincipal);
+//
+//        Community community = communityRepository.findById(postId)
+//                    .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+//
+//        ArrayList<String> imageUrlList = getImageUrlList(community);
+//        PostDetailResponse postDetailResponse = PostDetailResponse.builder()
+//                .postId(community.getCommunityId())
+//                .writer(community.getWriterName())
+//                .title(community.getPostTitle())
+//                .content(community.getPostContent())
+//                .createdAt(community.getCreatedAt().toString())
+//                .imageUrlList(imageUrlList)
+//                .likeCount(community.getLikeCount())
+//                .commentCount(getCommentCount(community))
+//                .isLiked(isLiked(user, community))
+//                .build();
+//
+//
+//
+//
+//
+//    }
 
+    private ArrayList<String> getImageUrlList(Community community) {
+        ArrayList<String> imageUrlList = new ArrayList<>();
+        for(CommunityImage communityImage : community.getCommunityImages()) {
+            imageUrlList.add(communityImage.getCommunityImageUrl());
+        }
+        return imageUrlList;
+    }
 
     private User getUser(UserPrincipal userPrincipal) {
 //      return userRepository.findById(userPrincipal.getId())
