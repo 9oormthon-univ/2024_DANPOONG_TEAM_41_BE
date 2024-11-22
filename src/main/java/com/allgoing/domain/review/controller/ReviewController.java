@@ -1,6 +1,7 @@
 package com.allgoing.domain.review.controller;
 
 import com.allgoing.domain.review.domain.Review;
+import com.allgoing.domain.review.dto.ReviewDto;
 import com.allgoing.domain.review.dto.request.ReviewRequestDto;
 import com.allgoing.domain.review.service.ReviewService;
 import com.allgoing.domain.user.domain.User;
@@ -67,6 +68,17 @@ public class ReviewController {
         try {
             reviewService.deleteReview(reviewId, 1L);
             return ResponseEntity.ok("Review deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    //리뷰 상세보기
+    @GetMapping("/detail/{reviewId}")
+    public ResponseEntity<?> detailReview(@PathVariable Long reviewId) {
+        try {
+            ReviewDto reviewDto = reviewService.detailReview(reviewId);
+            return ResponseEntity.ok(reviewDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
