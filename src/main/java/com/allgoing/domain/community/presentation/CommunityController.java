@@ -1,6 +1,7 @@
 package com.allgoing.domain.community.presentation;
 
 import com.allgoing.domain.community.application.CommunityService;
+import com.allgoing.domain.community.dto.request.NewCommentRequest;
 import com.allgoing.domain.community.dto.request.NewPostRequest;
 import com.allgoing.domain.community.dto.response.PostDetailResponse;
 import com.allgoing.global.config.security.token.CurrentUser;
@@ -70,6 +71,19 @@ public class CommunityController {
     }
 
 
+    @Operation(summary = "게시글 댓글 작성 API", description = "정보/질문 게시판에서 특정 게시글에 댓글을 작성하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 댓글 작성 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "게시글 댓글 작성 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @PostMapping("/{postId}/comment")
+    public ResponseEntity<?> createComment(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+            @Parameter(description = "게시글 아이디를 입력해주세요.", required = true) @PathVariable Long postId,
+            @Parameter(description = "게시글에 작성할 댓글을 입력해주세요.", required = true) @RequestBody NewCommentRequest newCommentRequest
+    ) {
+        return communityService.createComment(userPrincipal, postId, newCommentRequest);
+    }
 
 
 

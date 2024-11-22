@@ -8,6 +8,7 @@ import com.allgoing.domain.community.domain.repository.CommunityCommentRepositor
 import com.allgoing.domain.community.domain.repository.CommunityImageRepository;
 import com.allgoing.domain.community.domain.repository.CommunityLikeRepository;
 import com.allgoing.domain.community.domain.repository.CommunityRepository;
+import com.allgoing.domain.community.dto.request.NewCommentRequest;
 import com.allgoing.domain.community.dto.request.NewPostRequest;
 import com.allgoing.domain.community.dto.response.CommentResponse;
 import com.allgoing.domain.community.dto.response.PostDetailResponse;
@@ -186,6 +187,28 @@ public class CommunityService {
         // 댓글 생성일 기준으로 오름차순 정렬
         commentList.sort((o1, o2) -> o1.getCreatedAt().compareTo(o2.getCreatedAt()));
         return new ArrayList<>(commentList);
+    }
+
+    @Transactional
+    public ResponseEntity<?> createComment(UserPrincipal userPrincipal, Long postId, NewCommentRequest newCommentRequest) {
+        User user = getUser(userPrincipal);
+        Community community = getCommunity(postId);
+
+        CommunityComment communityComment = CommunityComment.builder()
+                .user(user)
+                .community(community)
+                .communityCommentContent(newCommentRequest.getContent())
+                .build();
+
+        communityCommentRepository.save(communityComment);
+
+        ApiResponse response = ApiResponse.builder()
+                .check(true)
+                .information("댓글 작성 완료")
+                .build();
+
+        return ResponseEntity.ok(response);
+
     }
 
 
