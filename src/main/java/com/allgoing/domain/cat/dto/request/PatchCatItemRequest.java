@@ -11,6 +11,6 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class PatchCatItemReq {
+public class PatchCatItemRequest {
     ArrayList<Long> itemIds;
 }
