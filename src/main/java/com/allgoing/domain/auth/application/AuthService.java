@@ -4,6 +4,8 @@ package com.allgoing.domain.auth.application;
 import com.allgoing.domain.auth.domain.Token;
 import com.allgoing.domain.auth.domain.repository.TokenRepository;
 import com.allgoing.domain.auth.dto.response.LoginResponse;
+import com.allgoing.domain.cat.domain.Cat;
+import com.allgoing.domain.cat.domain.repository.CatRepository;
 import com.allgoing.domain.user.domain.Provider;
 import com.allgoing.domain.user.domain.User;
 import com.allgoing.domain.user.domain.repository.UserRepository;
@@ -30,6 +32,7 @@ public class AuthService {
     private final UserDetailsService userDetailsService;
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
+    private final CatRepository catRepository;
 
     public String verifyIdTokenAndExtractUsername(String idToken, String email) {
         if (idToken == null || idToken.trim().isEmpty()) {
@@ -63,6 +66,10 @@ public class AuthService {
                         .build();
                 userRepository.save(user);
             }
+
+            // 고양이 객체 생성
+            Cat cat = Cat.builder().build();
+            catRepository.save(cat);
 
             LoginResponse loginResponse = LoginResponse.builder()
                     .accessToken(accessToken)
