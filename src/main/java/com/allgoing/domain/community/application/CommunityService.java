@@ -105,10 +105,17 @@ public class CommunityService {
 
         ApiResponse response = ApiResponse.builder()
                 .check(true)
-                .information(postListResponse)
+                .information(sortPostList(postListResponse))
                 .build();
 
         return ResponseEntity.ok(response);
+    }
+
+
+    private ArrayList<PostListResponse> sortPostList(ArrayList<PostListResponse> postListResponse) {
+        // 게시글 생성일 기준으로 내림차순 정렬
+        postListResponse.sort((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()));
+        return new ArrayList<>(postListResponse);
     }
 
     private Boolean isLiked(User user, Community community) {
@@ -172,8 +179,16 @@ public class CommunityService {
             commentList.add(comment);
         }
 
-        return commentList;
+        return sortCommentList(commentList);
     }
+
+    private ArrayList<CommentResponse> sortCommentList(List<CommentResponse> commentList) {
+        // 댓글 생성일 기준으로 오름차순 정렬
+        commentList.sort((o1, o2) -> o1.getCreatedAt().compareTo(o2.getCreatedAt()));
+        return new ArrayList<>(commentList);
+    }
+
+
 
     private User getUser(UserPrincipal userPrincipal) {
 //      return userRepository.findById(userPrincipal.getId())
