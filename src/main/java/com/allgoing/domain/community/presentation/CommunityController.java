@@ -123,6 +123,18 @@ public class CommunityController {
         return communityService.getMyLikedPost(userPrincipal);
     }
 
+    @Operation(summary = "내가 댓글을 등록한 게시글 조회 API", description = "정보/질문 게시판에서 내가 댓글을 등록한 게시글을 조회하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "댓글 등록 게시글 조회 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ArrayList.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "댓글 등록 게시글 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @GetMapping("/my/comment")
+    public ResponseEntity<?> getMyCommentPost(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal
+    ) {
+        return communityService.getMyCommentPost(userPrincipal);
+    }
+
 
 
 }

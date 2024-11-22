@@ -314,6 +314,42 @@ public class CommunityService {
         return ResponseEntity.ok(response);
     }
 
+    public ResponseEntity<?> getMyCommentPost(UserPrincipal userPrincipal) {
+        User user = getUser(userPrincipal);
+        List<CommunityComment> communityCommentList = communityCommentRepository.findAllByUser(user);
+        List<Community> communityList = new ArrayList<>();
+
+        for(CommunityComment communityComment : communityCommentList) {
+            if(!communityList.contains(communityComment.getCommunity())) {
+                communityList.add(communityComment.getCommunity());
+            }
+        }
+
+        ArrayList<PostListResponse> postListResponse = new ArrayList<>();
+
+        for(Community community : communityList) {
+            PostListResponse postList = PostListResponse.builder()
+                    .postId(community.getCommunityId())
+                    .title(community.getPostTitle())
+                    .content(community.getPostContent())
+                    .createdAt(community.getCreatedAt())
+                    .thumbnailUrl(getFirstImage(community).getCommunityImageUrl())
+                    .likeCount(community.getLikeCount())
+                    .commentCount(getCommentCount(community))
+                    .isLiked(isLiked(user, community))
+                    .build();
+
+            postListResponse.add(postList);
+        }
+
+        ApiResponse response = ApiResponse.builder()
+                .check(true)
+                .information(sortPostList(postListResponse))
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
     private User getUser(UserPrincipal userPrincipal) {
 //      return userRepository.findById(userPrincipal.getId())
 //                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
