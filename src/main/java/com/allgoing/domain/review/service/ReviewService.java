@@ -2,10 +2,12 @@ package com.allgoing.domain.review.service;
 
 import com.allgoing.domain.review.domain.Review;
 import com.allgoing.domain.review.domain.ReviewImage;
+import com.allgoing.domain.review.domain.ReviewLike;
 import com.allgoing.domain.review.dto.ReviewDto;
 import com.allgoing.domain.review.dto.ReviewImageDto;
 import com.allgoing.domain.review.dto.request.ReviewRequestDto;
 import com.allgoing.domain.review.repository.ReviewImageRepository;
+import com.allgoing.domain.review.repository.ReviewLikeRepository;
 import com.allgoing.domain.review.repository.ReviewRepository;
 import com.allgoing.domain.store.domain.Store;
 import com.allgoing.domain.store.repository.StoreRepository;
@@ -34,6 +36,7 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final TraditionalRepository traditionalRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
     private final S3Util s3Util;
 
     //리뷰 등록
@@ -167,6 +170,50 @@ public class ReviewService {
                         .build())
                 .toList();
         return ReviewDtoList;
+    }
+
+
+    @Transactional
+    public void likeReview(Long reviewId, Long userId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 리뷰 없음 id: " + reviewId));
+
+        // User 가져오기
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
+
+        // 이미 좋아요한 경우 예외 처리
+        if (reviewLikeRepository.existsByReviewAndUser(review, user)) {
+            throw new DefaultException(ErrorCode.INVALID_PARAMETER, "이미 좋아요를 누른 상태입니다.");
+        }
+
+        // ReviewLike 생성 및 저장
+        ReviewLike reviewLike = new ReviewLike(user, review);
+        reviewLikeRepository.save(reviewLike);
+
+        // 좋아요 카운트 증가
+        review.incrementLikeCount();
+        reviewRepository.save(review);
+    }
+
+    @Transactional
+    public void unlikeReview(Long reviewId, Long userId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 리뷰 없음 id: " + reviewId));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
+
+        // 좋아요 기록 찾기
+        ReviewLike reviewLike = reviewLikeRepository.findByReviewAndUser(review, user)
+                .orElseThrow(() -> new EntityNotFoundException("좋아요 기록이 존재하지 않습니다."));
+
+        // 좋아요 삭제
+        reviewLikeRepository.delete(reviewLike);
+
+        // 좋아요 카운트 감소
+        review.decrementLikeCount();
+        reviewRepository.save(review);
     }
 
     public List<Review> allReiews() {

@@ -105,8 +105,32 @@ public class ReviewController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-    
-    
+
+    // 리뷰 좋아요
+    @PostMapping("/like/{reviewId}")
+    public ResponseEntity<?> likeReview(@PathVariable Long reviewId) {
+        try {
+            // 로그인 사용자 임시 ID 사용 (1L)
+            reviewService.likeReview(reviewId, 1L);
+            return ResponseEntity.ok("Review liked successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    // 리뷰 좋아요 취소
+    @DeleteMapping("/like/{reviewId}")
+    public ResponseEntity<?> unlikeReview(@PathVariable Long reviewId) {
+        try {
+            // 로그인 사용자 임시 ID 사용 (1L)
+            reviewService.unlikeReview(reviewId, 1L);
+            return ResponseEntity.ok("Review unliked successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+
 
     //모든 리뷰 보기
     @GetMapping("/all")
