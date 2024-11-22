@@ -49,11 +49,12 @@ public class CommunityController {
             @ApiResponse(responseCode = "400", description = "게시글 목록 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
     })
     @GetMapping("/list")
-    public ResponseEntity<?> createNewPost(
+    public ResponseEntity<?> getPostList(
             @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal
     ) {
         return communityService.getPostList(userPrincipal);
     }
+
 
 
 
