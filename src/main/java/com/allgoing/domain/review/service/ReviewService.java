@@ -8,10 +8,12 @@ import com.allgoing.domain.review.repository.ReviewRepository;
 import com.allgoing.domain.store.domain.Store;
 import com.allgoing.domain.store.repository.StoreRepository;
 import com.allgoing.domain.user.domain.User;
+import com.allgoing.domain.user.domain.repository.UserRepository;
 import com.allgoing.global.error.DefaultException;
 import com.allgoing.global.payload.ErrorCode;
 import com.allgoing.global.util.S3Util;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -24,21 +26,23 @@ import org.springframework.web.multipart.MultipartFile;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final StoreRepository storeRepository;
+    private final UserRepository userRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final S3Util s3Util;
 
-    public void createReview(ReviewRequestDto.Review review, User user, Long storeId, List<MultipartFile> files) {
+    @Transactional
+    public void createReview(ReviewRequestDto.Review review, Long userId, Long storeId, List<MultipartFile> files) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));
 
         //Review 엔티티 생성 및 저장
         Review newReview = Review.builder()
-                .user(user)
+                .user(userRepository.getById(userId))
                 .reviewTitle(review.getReviewTitle())
                 .reviewContent(review.getReviewContent())
                 .store(store)
                 .likeCount(0)
-                .writerName(user.getName())
+                .writerName(userRepository.getById(userId).getName())
                 .build();
 
         reviewRepository.save(newReview);
@@ -55,16 +59,19 @@ public class ReviewService {
 
                 reviewImageRepository.save(reviewImage);
             }
+        }else{
+            System.out.println("ASDfasdfsdafasdf");
         }
 
         reviewRepository.save(newReview);
     }
 
-    public void deleteReview(Long reviewId, User user) {
+    @Transactional
+    public void deleteReview(Long reviewId, Long userId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 리뷰 없음 id: " + reviewId));
 
-        if(!review.getUser().equals(user)) {
+        if(!review.getUser().equals(userRepository.getById(userId))) {
             throw new DefaultException(ErrorCode.INVALID_AUTHENTICATION, "리뷰 작성자만 삭제 가능합니다");
         }
         List<ReviewImage> reviewImages = review.getReviewImages();
@@ -81,4 +88,3 @@ public class ReviewService {
         return reviewRepository.findAll();
     }
 }
-

@@ -15,6 +15,7 @@ import com.allgoing.domain.store.dto.StoreImageDto;
 import com.allgoing.domain.store.dto.StoreInfoDto;
 import com.allgoing.domain.store.repository.StoreRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Builder;
@@ -41,6 +42,7 @@ public class StoreService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public StoreSummaryResponse getStoreSummary(Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));
@@ -64,6 +66,7 @@ public class StoreService {
         return storeSummaryResponse;
     }
 
+    @Transactional
     public StoreHomeResponse getStoreHome(Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));
@@ -105,6 +108,7 @@ public class StoreService {
                 .build();
     }
 
+    @Transactional
     public List<StoreNoticeResponse> getStoreNotice(Long storeId){
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));
@@ -118,6 +122,7 @@ public class StoreService {
         return storeNoticeList;
     }
 
+    @Transactional
     public List<StoreReviewResponse> getStoreReview(Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));

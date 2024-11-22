@@ -46,11 +46,11 @@ public class ReviewController {
         if (errors.hasErrors()) {
             return ResponseEntity.badRequest().body(errors.getAllErrors());
         }
-        User user = userRepository.getById(1L);
+//        User user = userRepository.getById(1L);
 
         try {
             // 리뷰 생성 서비스 호출
-            reviewService.createReview(review, user, storeId, files);
+            reviewService.createReview(review, 1L, storeId, files);
 
             // 성공 응답 반환
             return ResponseEntity.ok("Review created successfully");
@@ -63,10 +63,10 @@ public class ReviewController {
     //리뷰 삭제
     @DeleteMapping("/delete/{reviewId}")
     public ResponseEntity<?> deleteReview(@PathVariable Long reviewId) {
-        User user = userRepository.getById(1L);
+//        User user = userRepository.getById(1L);
         try {
-            reviewService.deleteReview(reviewId, user);
-            return ResponseEntity.ok("Review created successfully");
+            reviewService.deleteReview(reviewId, 1L);
+            return ResponseEntity.ok("Review deleted successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
