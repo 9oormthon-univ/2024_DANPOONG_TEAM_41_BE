@@ -1,10 +1,11 @@
 package com.allgoing.domain.reservation.controller;
 
-import com.allgoing.domain.reservation.domain.Reservation;
-import com.allgoing.domain.reservation.domain.request.ReservationRequest;
+import com.allgoing.domain.reservation.dto.request.ReservationRequest;
+import com.allgoing.domain.reservation.dto.response.ReservationResponse;
 import com.allgoing.domain.reservation.service.ReservationService;
 import com.allgoing.global.payload.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -45,12 +46,59 @@ public class ReservationController {
     @PatchMapping("/{reservationId}")
     public ResponseEntity<?> cancelReservation(@PathVariable Long reservationId) {
         try {
+            //임시로 1번 유저 사용
 //            reservationService.makeReservation(storeId, userId);
             reservationService.cancelReservation(reservationId, 1L);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)
                             .information("Reservation canceled successfully")
+                            .build()
+            );
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.internalServerError().body(
+                    ApiResponse.builder()
+                            .check(false)
+                            .information(e.getMessage())
+                            .build()
+            );
+        }
+    }
+
+    //내 예약 내역 보기
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyReservations() {
+        try {
+            //임시로 1번 유저 사용
+//            reservationService.makeReservation(storeId, userId);
+            List<ReservationResponse> myReservations = reservationService.getMyReservations(1L);
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .check(true)
+                            .information(myReservations)
+                            .build()
+            );
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.internalServerError().body(
+                    ApiResponse.builder()
+                            .check(false)
+                            .information(e.getMessage())
+                            .build()
+            );
+        }
+    }
+
+    //가게 예약내역 보기
+    @GetMapping("/store/{storeId}")
+    public ResponseEntity<?> getStoreReservations(@PathVariable Long storeId) {
+        try {
+            List<ReservationResponse> myReservations = reservationService.getStoreReservations(storeId);
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .check(true)
+                            .information(myReservations)
                             .build()
             );
         } catch (Exception e) {

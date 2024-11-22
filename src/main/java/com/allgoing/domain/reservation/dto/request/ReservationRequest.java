@@ -1,4 +1,4 @@
-package com.allgoing.domain.reservation.domain.request;
+package com.allgoing.domain.reservation.dto.request;
 
 
 import java.time.LocalDate;
