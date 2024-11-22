@@ -1,10 +1,13 @@
 package com.allgoing.domain.community.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
@@ -15,7 +18,8 @@ public class CommentResponse {
     private Long commentId;
 
     @Schema( type = "string", example = "2021-08-01", description="댓글 작성일입니다.")
-    private String createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDateTime createdAt;
 
     @Schema( type = "String", example = "작성자", description="댓글 작성자입니다.")
     private String writer;

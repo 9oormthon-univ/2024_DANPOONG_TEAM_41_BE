@@ -1,10 +1,12 @@
 package com.allgoing.domain.community.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
@@ -21,7 +23,8 @@ public class PostListResponse {
     private String content;
 
     @Schema( type = "String", example = "2021-08-01", description="게시글 작성일입니다.")
-    private String createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDateTime createdAt;
 
     @Schema( type = "String", example = "https://i.pinimg.com/236x/2a/54/c7/2a54c75d16c89689016610afcd1fdd15.jpg", description="게시글 썸네일 이미지 url 입니다.")
     private String thumbnailUrl;
