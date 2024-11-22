@@ -130,6 +130,18 @@ public class ReviewController {
         }
     }
 
+    //좋아요 한 리뷰 보기
+    @GetMapping("/like")
+    public ResponseEntity<?> likeReview(){
+        try {
+            // 로그인 사용자 임시 ID 사용 (1L)
+            List<ReviewDto> reviewDtos = reviewService.likeReviewList(1L);
+            return ResponseEntity.ok(reviewDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
 
 
     //모든 리뷰 보기

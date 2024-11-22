@@ -216,9 +216,31 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
+    @Transactional
+    public List<ReviewDto> likeReviewList(Long userId) {
+        List<ReviewDto> allLikeReview = reviewLikeRepository.findAllByUserUserId(userId).stream()
+                .map(reviewLike -> ReviewDto.builder()
+                        .reviewTitle(reviewLike.getReview().getReviewTitle())
+                        .reviewContent(reviewLike.getReview().getReviewContent())
+                        .reviewId(reviewLike.getReview().getReviewId())
+                        .likeCount(reviewLike.getReview().getLikeCount())
+                        .writerName(reviewLike.getReview().getWriterName())
+                        .storeId(reviewLike.getReview().getStore().getStoreId())
+                        .userId(reviewLike.getReview().getUser().getUserId())
+                        .reviewImages(reviewLike.getReview().getReviewImages().stream()
+                                .map(reviewImage -> ReviewImageDto.builder()
+                                        .reviewImageUrl(reviewImage.getReviewImageUrl())
+                                        .reviewImageId(reviewImage.getReviewImageId())
+                                        .reviewId(reviewImage.getReviewImageId())
+                                        .build()).toList())
+                        .build()).toList();
+        return allLikeReview;
+    }
+
     public List<Review> allReiews() {
         return reviewRepository.findAll();
     }
+
 
 
 }

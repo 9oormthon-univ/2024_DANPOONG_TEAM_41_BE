@@ -5,5 +5,5 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    public List<Review> findAllByUserUserId(Long userId);
+    List<Review> findAllByUserUserId(Long userId);
 }
