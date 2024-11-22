@@ -1,5 +1,6 @@
 package com.allgoing.domain.review.controller;
 
+import com.allgoing.domain.cat.dto.response.ExpResponse;
 import com.allgoing.domain.review.domain.Review;
 import com.allgoing.domain.review.dto.ReviewDto;
 import com.allgoing.domain.review.dto.request.ReviewRequestDto;
@@ -51,11 +52,11 @@ public class ReviewController {
             );
         }
         try {
-            reviewService.createReview(review, 1L, storeId, files);
+            ExpResponse catExp = reviewService.createReview(review, 1L, storeId, files);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)
-                            .information("Review created successfully")
+                            .information(catExp)
                             .build()
             );
         } catch (Exception e) {

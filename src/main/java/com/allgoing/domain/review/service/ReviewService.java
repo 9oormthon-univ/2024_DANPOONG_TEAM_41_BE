@@ -1,5 +1,9 @@
 package com.allgoing.domain.review.service;
 
+import com.allgoing.domain.cat.application.CatService;
+import com.allgoing.domain.cat.domain.Cat;
+import com.allgoing.domain.cat.domain.repository.CatRepository;
+import com.allgoing.domain.cat.dto.response.ExpResponse;
 import com.allgoing.domain.review.domain.Review;
 import com.allgoing.domain.review.domain.ReviewImage;
 import com.allgoing.domain.review.domain.ReviewLike;
@@ -39,9 +43,12 @@ public class ReviewService {
     private final ReviewLikeRepository reviewLikeRepository;
     private final S3Util s3Util;
 
+    private final CatRepository catRepository;
+    private final CatService catService;
+
     //리뷰 등록
     @Transactional
-    public void createReview(ReviewRequestDto.Review review, Long userId, Long storeId, List<MultipartFile> files) {
+    public ExpResponse createReview(ReviewRequestDto.Review review, Long userId, Long storeId, List<MultipartFile> files) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));
 
@@ -81,6 +88,18 @@ public class ReviewService {
                 }
             }
         }
+
+        //고양이 경험치 증가 로직
+        Cat cat = catRepository.findByUserId(userId).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+
+        catService.plusExp(cat, 3L);
+
+        ExpResponse catExp = ExpResponse.builder()
+                .catExp(cat.getCatExp())
+                .level(cat.getLevel())
+                .build();
+
+        return catExp;
     }
 
 

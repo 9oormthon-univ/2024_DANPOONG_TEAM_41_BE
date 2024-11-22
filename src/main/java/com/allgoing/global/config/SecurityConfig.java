@@ -18,6 +18,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/health-check",
+                                "/api/v1/post/**",
+                                "/auth/**",
                                 "/oauth2/callback/kakao" // 카카오 로그인 엔드포인트 인증 없이 허용
                         ).permitAll()
                         .anyRequest().authenticated()
