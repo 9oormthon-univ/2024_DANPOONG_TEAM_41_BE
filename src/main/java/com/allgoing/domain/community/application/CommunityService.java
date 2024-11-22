@@ -280,6 +280,40 @@ public class CommunityService {
         return ResponseEntity.ok(response);
     }
 
+    public ResponseEntity<?> getMyLikedPost(UserPrincipal userPrincipal) {
+        User user = getUser(userPrincipal);
+        List<CommunityLike> communityLikeList = communityLikeRepository.findAllByUser(user);
+        List<Community> communityList = new ArrayList<>();
+
+        for(CommunityLike communityLike : communityLikeList) {
+            communityList.add(communityLike.getCommunity());
+        }
+
+        ArrayList<PostListResponse> postListResponse = new ArrayList<>();
+
+        for(Community community : communityList) {
+            PostListResponse postList = PostListResponse.builder()
+                    .postId(community.getCommunityId())
+                    .title(community.getPostTitle())
+                    .content(community.getPostContent())
+                    .createdAt(community.getCreatedAt())
+                    .thumbnailUrl(getFirstImage(community).getCommunityImageUrl())
+                    .likeCount(community.getLikeCount())
+                    .commentCount(getCommentCount(community))
+                    .isLiked(isLiked(user, community))
+                    .build();
+
+            postListResponse.add(postList);
+        }
+
+        ApiResponse response = ApiResponse.builder()
+                .check(true)
+                .information(sortPostList(postListResponse))
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
     private User getUser(UserPrincipal userPrincipal) {
 //      return userRepository.findById(userPrincipal.getId())
 //                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));

@@ -103,7 +103,7 @@ public class CommunityController {
             @ApiResponse(responseCode = "200", description = "작성한 게시글 조회 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ArrayList.class) ) } ),
             @ApiResponse(responseCode = "400", description = "작성한 게시글 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
     })
-    @PostMapping("/my/list")
+    @GetMapping("/my/list")
     public ResponseEntity<?> getMyPost(
             @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal
     ) {
@@ -111,8 +111,17 @@ public class CommunityController {
     }
 
 
-
-
+    @Operation(summary = "내가 좋아요를 등록한 게시글 조회 API", description = "정보/질문 게시판에서 내가 좋아요를 등록한 게시글을 조회하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "좋아요 등록 게시글 조회 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ArrayList.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "좋아요 등록 게시글 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @GetMapping("/my/like")
+    public ResponseEntity<?> getMyLikedPost(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal
+    ) {
+        return communityService.getMyLikedPost(userPrincipal);
+    }
 
 
 
