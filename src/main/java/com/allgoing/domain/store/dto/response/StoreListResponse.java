@@ -1,9 +1,11 @@
 package com.allgoing.domain.store.dto.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 @AllArgsConstructor
 public class StoreListResponse {
     private Long storeId;

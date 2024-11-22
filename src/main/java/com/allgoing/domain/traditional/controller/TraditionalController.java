@@ -1,5 +1,6 @@
 package com.allgoing.domain.traditional.controller;
 
+import com.allgoing.domain.store.dto.response.StoreListResponse;
 import com.allgoing.domain.traditional.dto.TraditionalDto;
 import com.allgoing.domain.traditional.service.TraditionalService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,8 +37,8 @@ public class TraditionalController {
     @GetMapping("/{traditionalId}")
     public ResponseEntity<?> getTraditionalById(@PathVariable Long traditionalId) {
         try {
-            List<TraditionalDto> traditionalDtos = traditionalService.allTraditional();
-            return ResponseEntity.ok(traditionalDtos);
+            List<StoreListResponse> allStores = traditionalService.allTraditionalStores(traditionalId);
+            return ResponseEntity.ok(allStores);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
