@@ -1,9 +1,12 @@
 package com.allgoing.domain.reservation.domain;
 
+import com.allgoing.domain.product.domain.Product;
 import com.allgoing.domain.store.domain.Store;
 import com.allgoing.domain.common.BaseEntity;
 import com.allgoing.domain.user.domain.User;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,5 +50,13 @@ public class Reservation extends BaseEntity {
     @JoinColumn(name = "reservation_user_id")
     private User reservationUser;
 
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ReservationProduct> reservationProducts = new ArrayList<>();
 
+    // 상품 추가
+    public void addProduct(Product product, int quantity) {
+        ReservationProduct reservationProduct = new ReservationProduct(this, product, quantity);
+        this.reservationProducts.add(reservationProduct);
+    }
 }

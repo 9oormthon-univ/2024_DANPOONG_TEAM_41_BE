@@ -1,5 +1,6 @@
 package com.allgoing.domain.reservation.controller;
 
+import com.allgoing.domain.product.dto.ProductDto;
 import com.allgoing.domain.reservation.dto.request.ReservationRequest;
 import com.allgoing.domain.reservation.dto.response.ReservationResponse;
 import com.allgoing.domain.reservation.service.ReservationService;
@@ -18,6 +19,28 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/reservation")
 public class ReservationController {
     private final ReservationService reservationService;
+
+    //예약 과정중 해당 가게 상품 조회
+    @GetMapping("/product/{storeId}")
+    public ResponseEntity<?> getStoreProduct(@PathVariable Long storeId) {
+        try {
+            List<ProductDto> storeProduct = reservationService.getStoreProduct(storeId);
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .check(true)
+                            .information(storeProduct)
+                            .build()
+            );
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.internalServerError().body(
+                    ApiResponse.builder()
+                            .check(false)
+                            .information(e.getMessage())
+                            .build()
+            );
+        }
+    }
 
     //예약하기
     @PostMapping("/{storeId}")

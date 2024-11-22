@@ -1,5 +1,8 @@
 package com.allgoing.domain.reservation.service;
 
+import com.allgoing.domain.product.domain.Product;
+import com.allgoing.domain.product.dto.ProductDto;
+import com.allgoing.domain.product.repository.ProductRepository;
 import com.allgoing.domain.reservation.domain.Reservation;
 import com.allgoing.domain.reservation.domain.ReservationStatus;
 import com.allgoing.domain.reservation.dto.request.ReservationRequest;
@@ -13,6 +16,7 @@ import com.allgoing.domain.user.domain.repository.UserRepository;
 import com.allgoing.global.error.DefaultException;
 import com.allgoing.global.payload.ErrorCode;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +28,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
     @Transactional
     public void makeReservation(ReservationRequest reservationRequest, Long storeId, Long userId) {
@@ -44,6 +49,13 @@ public class ReservationService {
                 .reservationStatus(ReservationStatus.YET)
                 .reservationUser(user)
                 .build();
+
+        // 상품 추가
+        for (ReservationRequest.ProductRequest productRequest : reservationRequest.getProducts()) {
+            Product product = productRepository.findById(productRequest.getProductId())
+                    .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 상품 없음: " + productRequest.getProductId()));
+            reservation.addProduct(product, productRequest.getQuantity());
+        }
 
         // Reservation 저장
         reservationRepository.save(reservation);
@@ -70,17 +82,14 @@ public class ReservationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 유저 없음: " + userId));
 
-        List<ReservationResponse> reservationList = reservationRepository.findAllByUserUserId(userId).stream()
-                .map(reservation -> ReservationResponse.builder()
-                        .storeId(reservation.getStore().getStoreId())
-                        .storeName(reservation.getStore().getStoreName())
-                        .reservationId(reservation.getReservationId())
-                        .reservationStatus(reservation.getReservationStatus())
-                        .reservationDate(reservation.getReservationDate())
-                        .reservationTime(reservation.getReservationTime())
-                        .build()).toList();
+        List<Reservation> reservations = reservationRepository.findAllByUserUserId(userId);
+        List<ReservationResponse> responses = new ArrayList<>();
 
-        return reservationList;
+        for (Reservation reservation : reservations) {
+            responses.add(makeReservationResponse(reservation));
+        }
+
+        return responses;
     }
 
     @Transactional
@@ -88,16 +97,50 @@ public class ReservationService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 가게 없음: " + storeId));
 
-        List<ReservationResponse> storeReservations = reservationRepository.findAllByStoreStoreId(storeId).stream()
-                .map(reservation -> ReservationResponse.builder()
-                        .storeId(reservation.getStore().getStoreId())
-                        .storeName(reservation.getStore().getStoreName())
-                        .reservationId(reservation.getReservationId())
-                        .reservationStatus(reservation.getReservationStatus())
-                        .reservationDate(reservation.getReservationDate())
-                        .reservationTime(reservation.getReservationTime())
+        List<Reservation> reservations = reservationRepository.findAllByStoreStoreId(storeId);
+        List<ReservationResponse> responses = new ArrayList<>();
+
+        for (Reservation reservation : reservations) {
+            responses.add(makeReservationResponse(reservation));
+        }
+
+        return responses;
+    }
+
+    @Transactional
+    public List<ProductDto> getStoreProduct(Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 가게 없음: " + storeId));
+
+        List<ProductDto> productDtoList = store.getProducts().stream()
+                .map(product -> ProductDto.builder()
+                        .productId(product.getProductId())
+                        .productName(product.getProductName())
+                        .productPrice(product.getProductPrice())
+                        .productImageUrl(product.getProductImageUrl())
                         .build()).toList();
 
-        return storeReservations;
+        return productDtoList;
     }
+
+    private ReservationResponse makeReservationResponse(Reservation reservation) {
+        List<ReservationResponse.ProductResponse> products = reservation.getReservationProducts().stream()
+                .map(rp -> ReservationResponse.ProductResponse.builder()
+                        .productId(rp.getProduct().getProductId())
+                        .productName(rp.getProduct().getProductName())
+                        .quantity(rp.getQuantity())
+                        .build())
+                .toList();
+
+        return ReservationResponse.builder()
+                .reservationId(reservation.getReservationId())
+                .reservationStatus(reservation.getReservationStatus())
+                .reservationDate(reservation.getReservationDate())
+                .reservationTime(reservation.getReservationTime())
+                .storeId(reservation.getStore().getStoreId())
+                .storeName(reservation.getStore().getStoreName())
+                .products(products)
+                .build();
+    }
+
 }

@@ -1,7 +1,10 @@
 package com.allgoing.domain.product.domain;
 
+import com.allgoing.domain.reservation.domain.ReservationProduct;
 import com.allgoing.domain.store.domain.Store;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,4 +31,6 @@ public class Product {
     @Column(name="product_image_url")
     private String productImageUrl;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReservationProduct> reservationProducts = new ArrayList<>();
 }
