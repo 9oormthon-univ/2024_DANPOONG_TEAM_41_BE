@@ -36,6 +36,7 @@ public class StoreService {
                         store.getStoreName(),
                         store.getStoreIntro(),
                         store.getStoreAddress(),
+                        store.getStar(),
                         store.getStoreLatitude(),
                         store.getStoreLongitude()
                 ))
@@ -61,6 +62,7 @@ public class StoreService {
                 .storeIntro(store.getStoreIntro())
                 .reviewCount(store.getStoreReviews().size())
                 .storeImageUrl(getImageUrl(store))
+                .star(store.getStar())
                 .build();
 
         return storeSummaryResponse;
@@ -105,6 +107,7 @@ public class StoreService {
                 .products(productDtos)
                 .storeImages(storeImageDtos)
                 .storeInfos(storeInfoDtos)
+                .star(store.getStar())
                 .build();
     }
 
@@ -144,6 +147,7 @@ public class StoreService {
                                         .build())
                                 .toList())
                         .createdAt(review.getCreatedAt())
+                        .star(review.getStar())
                         .build())
                 .toList();
         return storeReviewList;

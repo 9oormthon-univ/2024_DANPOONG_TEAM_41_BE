@@ -21,5 +21,8 @@ public class ReviewRequestDto {
 
         @NotEmpty(message = "내용은 필수 입력값입니다.")
         private String reviewContent;
+
+        @NotEmpty(message = "별점은 필수 입력값입니다.")
+        private int star;
     }
 }

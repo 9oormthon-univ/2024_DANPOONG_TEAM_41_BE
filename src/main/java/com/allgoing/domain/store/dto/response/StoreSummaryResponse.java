@@ -16,6 +16,7 @@ public class StoreSummaryResponse {
     private String storeIntro;
     private String storeAddress;
     private String storeImageUrl;
+    private Double star;
     private List<StoreInfoDto> storeInfos;
     private long reviewCount;
 }

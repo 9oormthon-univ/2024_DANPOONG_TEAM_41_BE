@@ -13,6 +13,5 @@ import lombok.Getter;
 public class StoreNoticeResponse {
     private Long storeId;
     private String storeNoticeContent;
-    private List<StoreImageDto> storeNoticeImages;
     private LocalDateTime createdAt;
 }

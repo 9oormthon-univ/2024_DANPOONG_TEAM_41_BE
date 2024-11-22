@@ -20,6 +20,7 @@ public class StoreReviewResponse {
     private String writerName;
     private int commentCount;
     private LocalDateTime createdAt;
+    private int star;
 
     private List<ReviewImageDto> reviewImages;
 }

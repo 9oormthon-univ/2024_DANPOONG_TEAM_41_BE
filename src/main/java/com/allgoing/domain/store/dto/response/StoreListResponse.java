@@ -12,6 +12,7 @@ public class StoreListResponse {
     private String storeName;
     private String storeIntro;
     private String storeAddress;
+    private Double star;
     private double storeLatitude;
     private double storeLongitude;
 }

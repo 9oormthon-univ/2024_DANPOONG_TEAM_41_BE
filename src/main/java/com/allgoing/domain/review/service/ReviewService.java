@@ -45,19 +45,28 @@ public class ReviewService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));
 
-        //Review 엔티티 생성 및 저장
+        synchronized (store) {
+            int reviewNum = store.getStoreReviews().size();
+            double starAvg = store.getStar() != null ? store.getStar() : 0.0;
+
+            // 별점 평균 계산
+            double newAvg = (starAvg * reviewNum + review.getStar()) / (reviewNum + 1);
+            store.setStar(newAvg);
+        }
+
         Review newReview = Review.builder()
                 .user(userRepository.getById(userId))
                 .reviewTitle(review.getReviewTitle())
                 .reviewContent(review.getReviewContent())
                 .store(store)
                 .likeCount(0)
+                .star(review.getStar())
                 .writerName(userRepository.getById(userId).getName())
                 .build();
 
         reviewRepository.save(newReview);
 
-        //이미지 파일 처리 및 S3 업로드
+        // 이미지 파일 처리 및 S3 업로드
         if (files != null && !files.isEmpty()) {
             for (MultipartFile file : files) {
                 if (file != null && !file.isEmpty()) {
@@ -72,9 +81,8 @@ public class ReviewService {
                 }
             }
         }
-
-        reviewRepository.save(newReview);
     }
+
 
     //리뷰삭제
     @Transactional
@@ -82,23 +90,47 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 리뷰 없음 id: " + reviewId));
 
-        if(!review.getUser().equals(userRepository.getById(userId))) {
+        if (!review.getUser().equals(userRepository.getById(userId))) {
             throw new DefaultException(ErrorCode.INVALID_AUTHENTICATION, "리뷰 작성자만 삭제 가능합니다");
         }
+
+        Store store = review.getStore();
+
+        //별점 업데이트
+        synchronized (store) {
+            int reviewCount = store.getStoreReviews().size();
+            double currentStarAvg = store.getStar() != null ? store.getStar() : 0.0;
+
+            //새로운 평균 계산
+            if (reviewCount > 1) {
+                double newStarAvg = (currentStarAvg * reviewCount - review.getStar()) / (reviewCount - 1);
+                store.setStar(newStarAvg);
+            } else {
+                // 마지막 리뷰 삭제 시 별점 초기화
+                store.setStar(0.0);
+            }
+        }
+
+        // 리뷰 이미지 삭제
         List<ReviewImage> reviewImages = review.getReviewImages();
-        if(!reviewImages.isEmpty()) {
+        if (!reviewImages.isEmpty()) {
             for (ReviewImage reviewImage : reviewImages) {
-                System.out.println(reviewImage.getReviewImageUrl());
                 s3Util.deleteFile(reviewImage.getReviewImageUrl());
             }
         }
+
         reviewRepository.delete(review);
     }
 
+
     @Transactional
-    public ReviewDto detailReview(Long reviewId) {
+    public ReviewDto detailReview(Long reviewId, Long userId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 리뷰 없음 id: " + reviewId));
+
+        // User 가져오기
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
 
         return ReviewDto.builder()
                 .reviewId(review.getReviewId())
@@ -115,13 +147,19 @@ public class ReviewService {
                 .likeCount(review.getLikeCount())
                 .userId(review.getUser().getUserId())
                 .writerName(review.getWriterName())
+                .liked(reviewLikeRepository.existsByReviewAndUser(review, user))
+                .createdAt(review.getCreatedAt())
+                .star(review.getStar())
                 .build();
     }
 
     @Transactional
-    public List<ReviewDto> traditionalReview(Long traditionalId) {
+    public List<ReviewDto> traditionalReview(Long traditionalId, Long userId) {
         Traditional traditional = traditionalRepository.findById(traditionalId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 전통시장 없음 id: " + traditionalId));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
 
         List<Store> stores = traditional.getStore();
         List<ReviewDto> reviewDtos = new ArrayList<>();
@@ -135,6 +173,9 @@ public class ReviewService {
                             .likeCount(review.getLikeCount())
                             .writerName(review.getWriterName())
                             .userId(review.getUser().getUserId())
+                            .liked(reviewLikeRepository.existsByReviewAndUser(review, user))
+                            .createdAt(review.getCreatedAt())
+                            .star(review.getStar())
                             .reviewImages(review.getReviewImages().stream()
                                     .map(reviewImage -> ReviewImageDto.builder()
                                             .reviewId(review.getReviewId())
@@ -161,6 +202,9 @@ public class ReviewService {
                         .likeCount(review.getLikeCount())
                         .writerName(review.getWriterName())
                         .userId(review.getUser().getUserId())
+                        .liked(reviewLikeRepository.existsByReviewAndUser(review, user))
+                        .createdAt(review.getCreatedAt())
+                        .star(review.getStar())
                         .reviewImages(review.getReviewImages().stream()
                                 .map(reviewImage -> ReviewImageDto.builder()
                                         .reviewId(review.getReviewId())
@@ -218,6 +262,9 @@ public class ReviewService {
 
     @Transactional
     public List<ReviewDto> likeReviewList(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
+
         List<ReviewDto> allLikeReview = reviewLikeRepository.findAllByUserUserId(userId).stream()
                 .map(reviewLike -> ReviewDto.builder()
                         .reviewTitle(reviewLike.getReview().getReviewTitle())
@@ -227,6 +274,9 @@ public class ReviewService {
                         .writerName(reviewLike.getReview().getWriterName())
                         .storeId(reviewLike.getReview().getStore().getStoreId())
                         .userId(reviewLike.getReview().getUser().getUserId())
+                        .liked(true)
+                        .createdAt(reviewLike.getReview().getCreatedAt())
+                        .star(reviewLike.getReview().getStar())
                         .reviewImages(reviewLike.getReview().getReviewImages().stream()
                                 .map(reviewImage -> ReviewImageDto.builder()
                                         .reviewImageUrl(reviewImage.getReviewImageUrl())
@@ -237,10 +287,7 @@ public class ReviewService {
         return allLikeReview;
     }
 
-    public List<Review> allReiews() {
-        return reviewRepository.findAll();
-    }
-
-
-
+//    public List<Review> allReiews() {
+//        return reviewRepository.findAll();
+//    }
 }

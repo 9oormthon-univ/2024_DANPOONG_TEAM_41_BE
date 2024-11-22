@@ -17,7 +17,7 @@ public class StoreHomeResponse {
     private String storeIntro;
     private String storeAddress;
     private String storePhone;
-
+    private Double star;
     private List<ProductDto> products;
 
     private List<StoreImageDto> storeImages;

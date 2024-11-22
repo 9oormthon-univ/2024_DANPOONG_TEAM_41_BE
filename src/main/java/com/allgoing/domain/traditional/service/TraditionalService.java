@@ -40,6 +40,7 @@ public class TraditionalService {
                         .storeId(store.getStoreId())
                         .storeName(store.getStoreName())
                         .storeIntro(store.getStoreIntro())
+                        .star(store.getStar())
                         .storeLatitude(store.getStoreLatitude())
                         .storeLongitude(store.getStoreLongitude())
                         .storeAddress(store.getStoreAddress()).build())
