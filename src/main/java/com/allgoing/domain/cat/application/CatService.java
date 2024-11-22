@@ -4,7 +4,7 @@ import com.allgoing.domain.cat.domain.Cat;
 import com.allgoing.domain.cat.domain.CatItem;
 import com.allgoing.domain.cat.domain.repository.CatItemRepository;
 import com.allgoing.domain.cat.domain.repository.CatRepository;
-import com.allgoing.domain.cat.dto.request.PatchCatItemReq;
+import com.allgoing.domain.cat.dto.request.PatchCatItemRequest;
 import com.allgoing.domain.cat.dto.response.CatItemListResponse;
 import com.allgoing.domain.cat.dto.response.CatItemResponse;
 import com.allgoing.domain.cat.dto.response.ExpResponse;
@@ -73,7 +73,7 @@ public class CatService {
     }
 
     @Transactional
-    public ResponseEntity<?> patchCatItem(UserPrincipal userPrincipal, PatchCatItemReq patchCatItemReq) {
+    public ResponseEntity<?> patchCatItem(UserPrincipal userPrincipal, PatchCatItemRequest patchCatItemRequest) {
         Cat cat = getCatbyUser(userPrincipal);
         // 현재 Cat이 착용하고 있는 아이템 목록을 모두 착용 해제
         ArrayList<CatItem> catItems = catItemRepository.findByCat(cat);
@@ -82,7 +82,7 @@ public class CatService {
             catItem.updateIsEquipped(false);
         }
 
-        ArrayList<Long> equippedItemIds = patchCatItemReq.getItemIds();
+        ArrayList<Long> equippedItemIds = patchCatItemRequest.getItemIds();
 
         for(Long itemId : equippedItemIds) {
             CatItem catItem = catItemRepository.findByItem_ItemId(itemId);

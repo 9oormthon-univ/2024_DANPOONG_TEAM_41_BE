@@ -1,7 +1,7 @@
 package com.allgoing.domain.cat.presentation;
 
 import com.allgoing.domain.cat.application.CatService;
-import com.allgoing.domain.cat.dto.request.PatchCatItemReq;
+import com.allgoing.domain.cat.dto.request.PatchCatItemRequest;
 import com.allgoing.domain.cat.dto.response.CatItemListResponse;
 import com.allgoing.domain.cat.dto.response.ExpResponse;
 import com.allgoing.global.config.security.token.CurrentUser;
@@ -58,9 +58,9 @@ public class CatController {
     @PatchMapping("/item")
     public ResponseEntity<?> catItem(
             @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
-            @RequestBody PatchCatItemReq patchCatItemReq
+            @RequestBody PatchCatItemRequest patchCatItemRequest
     ) {
-        return catService.patchCatItem(userPrincipal, patchCatItemReq);
+        return catService.patchCatItem(userPrincipal, patchCatItemRequest);
     }
 
 

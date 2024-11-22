@@ -37,4 +37,12 @@ public class CatItem {
     public void updateIsEquipped(boolean b) {
         this.isEquipped = b;
     }
+
+    public void addCatItem(Cat cat, Item item) {
+        CatItem catItem = CatItem.builder()
+                .cat(cat)
+                .item(item)
+                .isEquipped(false)
+                .build();
+    }
 }
