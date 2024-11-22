@@ -1,6 +1,7 @@
 package com.allgoing.domain.cat.presentation;
 
 import com.allgoing.domain.cat.application.CatService;
+import com.allgoing.domain.cat.dto.response.CatItemListResponse;
 import com.allgoing.domain.cat.dto.response.ExpResponse;
 import com.allgoing.global.config.security.token.CurrentUser;
 import com.allgoing.global.config.security.token.UserPrincipal;
@@ -36,6 +37,18 @@ public class CatController {
             @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal
     ) {
         return catService.getExp(userPrincipal);
+    }
+
+    @Operation(summary = "착용 아이템 조회 API", description = "고양이가 현재 착용한 아이템 목록을 조회하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "착용 아이템 정보 조회 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = CatItemListResponse.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "착용 아이템 정보 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @GetMapping("/my")
+    public ResponseEntity<?> catItem(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal
+    ) {
+        return catService.getCatItems(userPrincipal);
     }
 
 
