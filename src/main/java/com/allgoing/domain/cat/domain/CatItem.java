@@ -34,4 +34,7 @@ public class CatItem {
         this.isEquipped = isEquipped;
     }
 
+    public void updateIsEquipped(boolean b) {
+        this.isEquipped = b;
+    }
 }

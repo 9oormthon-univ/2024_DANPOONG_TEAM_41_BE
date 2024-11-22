@@ -4,6 +4,7 @@ import com.allgoing.domain.cat.domain.Cat;
 import com.allgoing.domain.cat.domain.CatItem;
 import com.allgoing.domain.cat.domain.repository.CatItemRepository;
 import com.allgoing.domain.cat.domain.repository.CatRepository;
+import com.allgoing.domain.cat.dto.request.PatchCatItemReq;
 import com.allgoing.domain.cat.dto.response.CatItemListResponse;
 import com.allgoing.domain.cat.dto.response.CatItemResponse;
 import com.allgoing.domain.cat.dto.response.ExpResponse;
@@ -27,9 +28,7 @@ public class CatService {
     private final UserRepository userRepository;
 
     public ResponseEntity<?> getExp(UserPrincipal userPrincipal) {
-        // User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        // Cat cat = catRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
-        Cat cat = catRepository.findByUserId(1L).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+        Cat cat = getCatbyUser(userPrincipal);
 
         ExpResponse expResponse = ExpResponse.builder()
                 .level(cat.getLevel())
@@ -46,9 +45,7 @@ public class CatService {
 
 
     public ResponseEntity<?> getCatItems(UserPrincipal userPrincipal) {
-        // User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        // Cat cat = catRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
-        Cat cat = catRepository.findByUserId(1L).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+        Cat cat = getCatbyUser(userPrincipal);
         ArrayList<CatItem> catItems = catItemRepository.findByCat(cat);
 
         ArrayList<CatItemResponse> catItemResponses = new ArrayList<>();
@@ -73,5 +70,37 @@ public class CatService {
                 .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<?> patchCatItem(UserPrincipal userPrincipal, PatchCatItemReq patchCatItemReq) {
+        Cat cat = getCatbyUser(userPrincipal);
+        // 현재 Cat이 착용하고 있는 아이템 목록을 모두 착용 해제
+        ArrayList<CatItem> catItems = catItemRepository.findByCat(cat);
+
+        for (CatItem catItem : catItems) {
+            catItem.updateIsEquipped(false);
+        }
+
+        ArrayList<Long> equippedItemIds = patchCatItemReq.getItemIds();
+
+        for(Long itemId : equippedItemIds) {
+            CatItem catItem = catItemRepository.findByItem_ItemId(itemId);
+            catItem.updateIsEquipped(true);
+        }
+
+        ApiResponse response = ApiResponse.builder()
+                .check(true)
+                .information("아이템 착용 정보 수정 성공")
+                .build();
+
+        return ResponseEntity.ok(response);
+
+    }
+
+
+    private Cat getCatbyUser(UserPrincipal userPrincipal) {
+        // User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        // return catRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+        return catRepository.findByUserId(1L).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
     }
 }

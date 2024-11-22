@@ -1,10 +1,12 @@
 package com.allgoing.domain.cat.presentation;
 
 import com.allgoing.domain.cat.application.CatService;
+import com.allgoing.domain.cat.dto.request.PatchCatItemReq;
 import com.allgoing.domain.cat.dto.response.CatItemListResponse;
 import com.allgoing.domain.cat.dto.response.ExpResponse;
 import com.allgoing.global.config.security.token.CurrentUser;
 import com.allgoing.global.config.security.token.UserPrincipal;
+import com.allgoing.global.payload.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,10 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,6 +48,19 @@ public class CatController {
             @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal
     ) {
         return catService.getCatItems(userPrincipal);
+    }
+
+    @Operation(summary = "착용 아이템 수정 API", description = "고양이 착용 아이템을 수정하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "착용 아이템 수정 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "착용 아이템 수정 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @PatchMapping("/item")
+    public ResponseEntity<?> catItem(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+            @RequestBody PatchCatItemReq patchCatItemReq
+    ) {
+        return catService.patchCatItem(userPrincipal, patchCatItemReq);
     }
 
 
