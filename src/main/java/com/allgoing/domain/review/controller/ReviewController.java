@@ -4,7 +4,6 @@ import com.allgoing.domain.review.domain.Review;
 import com.allgoing.domain.review.dto.ReviewDto;
 import com.allgoing.domain.review.dto.request.ReviewRequestDto;
 import com.allgoing.domain.review.service.ReviewService;
-import com.allgoing.domain.user.domain.User;
 import com.allgoing.domain.user.domain.repository.UserRepository;
 import com.allgoing.global.payload.ApiResponse;
 import com.allgoing.global.util.S3Util;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -83,6 +81,32 @@ public class ReviewController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    //시장에 따른 리뷰보기
+    @GetMapping("/traditional/{traditionalId}")
+    public ResponseEntity<?> traditionalReview(@PathVariable Long traditionalId) {
+        try {
+            List<ReviewDto> reviewDtoList = reviewService.traditionalReview(traditionalId);
+            return ResponseEntity.ok(reviewDtoList);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    //내가 쓴 리뷰 보기
+    //로그인 미적용 관계로 1번 유저의 리뷰를 가져옴
+    @GetMapping("/myreview")
+    public ResponseEntity<?> myReview() {
+        try {
+//            User user = userRepository.getById(1L);
+            List<ReviewDto> reviewDtoList = reviewService.myReview(1L);
+            return ResponseEntity.ok(reviewDtoList);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    
 
     //모든 리뷰 보기
     @GetMapping("/all")
