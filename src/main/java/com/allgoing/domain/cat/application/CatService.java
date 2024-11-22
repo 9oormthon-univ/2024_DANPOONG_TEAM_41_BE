@@ -72,6 +72,7 @@ public class CatService {
         return ResponseEntity.ok(response);
     }
 
+    @Transactional
     public ResponseEntity<?> patchCatItem(UserPrincipal userPrincipal, PatchCatItemReq patchCatItemReq) {
         Cat cat = getCatbyUser(userPrincipal);
         // 현재 Cat이 착용하고 있는 아이템 목록을 모두 착용 해제
