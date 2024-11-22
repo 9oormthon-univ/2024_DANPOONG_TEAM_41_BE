@@ -24,6 +24,10 @@ public class Reservation extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name="reservation_status")
+    private ReservationStatus reservationStatus;
+
     @Column(name="reservation_date")
     private LocalDate reservationDate;
 
