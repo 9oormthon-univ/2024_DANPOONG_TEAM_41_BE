@@ -4,6 +4,8 @@ import com.allgoing.domain.store.domain.Store;
 import com.allgoing.domain.common.BaseEntity;
 import com.allgoing.domain.user.domain.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,8 +14,10 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name="Reservation")
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Builder
 public class Reservation extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,5 +46,6 @@ public class Reservation extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_user_id")
     private User reservationUser;
+
 
 }

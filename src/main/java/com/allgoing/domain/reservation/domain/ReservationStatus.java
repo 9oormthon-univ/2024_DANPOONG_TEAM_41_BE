@@ -8,7 +8,7 @@ import lombok.Getter;
 public enum ReservationStatus {
     DONE("DONE"),
     CANCEL("CANCEL"),
-    NOW("NOW");
+    YET("YET");
 
     private String value;
 }
