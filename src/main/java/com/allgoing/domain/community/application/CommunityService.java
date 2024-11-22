@@ -1,12 +1,15 @@
 package com.allgoing.domain.community.application;
 
 import com.allgoing.domain.community.domain.Community;
+import com.allgoing.domain.community.domain.CommunityComment;
 import com.allgoing.domain.community.domain.CommunityImage;
 import com.allgoing.domain.community.domain.CommunityLike;
+import com.allgoing.domain.community.domain.repository.CommunityCommentRepository;
 import com.allgoing.domain.community.domain.repository.CommunityImageRepository;
 import com.allgoing.domain.community.domain.repository.CommunityLikeRepository;
 import com.allgoing.domain.community.domain.repository.CommunityRepository;
 import com.allgoing.domain.community.dto.request.NewPostRequest;
+import com.allgoing.domain.community.dto.response.CommentResponse;
 import com.allgoing.domain.community.dto.response.PostDetailResponse;
 import com.allgoing.domain.community.dto.response.PostListResponse;
 import com.allgoing.domain.user.domain.User;
@@ -33,6 +36,7 @@ public class CommunityService {
     private final CommunityRepository communityRepository;
     private final CommunityImageRepository communityImageRepository;
     private final CommunityLikeRepository communityLikeRepository;
+    private final CommunityCommentRepository communityCommentRepository;
 
     private final S3Util s3Util;
 
@@ -120,31 +124,30 @@ public class CommunityService {
         return communityImageRepository.findFirstByCommunity(community);
     }
 
-//
-//    public ResponseEntity<?> getPostDetail(UserPrincipal userPrincipal, Long postId) {
-//        User user = getUser(userPrincipal);
-//
-//        Community community = communityRepository.findById(postId)
-//                    .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-//
-//        ArrayList<String> imageUrlList = getImageUrlList(community);
-//        PostDetailResponse postDetailResponse = PostDetailResponse.builder()
-//                .postId(community.getCommunityId())
-//                .writer(community.getWriterName())
-//                .title(community.getPostTitle())
-//                .content(community.getPostContent())
-//                .createdAt(community.getCreatedAt().toString())
-//                .imageUrlList(imageUrlList)
-//                .likeCount(community.getLikeCount())
-//                .commentCount(getCommentCount(community))
-//                .isLiked(isLiked(user, community))
-//                .build();
-//
-//
-//
-//
-//
-//    }
+    public ResponseEntity<?> getPostDetail(UserPrincipal userPrincipal, Long postId) {
+        User user = getUser(userPrincipal);
+        Community community = getCommunity(postId);
+
+        PostDetailResponse postDetailResponse = PostDetailResponse.builder()
+                .postId(community.getCommunityId())
+                .writer(community.getWriterName())
+                .title(community.getPostTitle())
+                .content(community.getPostContent())
+                .createdAt(community.getCreatedAt().toString())
+                .imageUrlList(getImageUrlList(community))
+                .likeCount(community.getLikeCount())
+                .commentCount(getCommentCount(community))
+                .isLiked(isLiked(user, community))
+                .commentList(getCommentList(community))
+                .build();
+
+        ApiResponse response = ApiResponse.builder()
+                .check(true)
+                .information(postDetailResponse)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
 
     private ArrayList<String> getImageUrlList(Community community) {
         ArrayList<String> imageUrlList = new ArrayList<>();
@@ -154,6 +157,24 @@ public class CommunityService {
         return imageUrlList;
     }
 
+    private ArrayList<CommentResponse> getCommentList(Community community) {
+        List<CommunityComment> communityComments = communityCommentRepository.findAllByCommunity(community);
+        ArrayList<CommentResponse> commentList = new ArrayList<>();
+
+        for(CommunityComment communityComment : communityComments) {
+            CommentResponse comment = CommentResponse.builder()
+                    .commentId(communityComment.getCommunityCommentId())
+                    .createdAt(communityComment.getCreatedAt().toString())
+                    .writer(communityComment.getUser().getName())
+                    .isWriter(communityComment.getUser().equals(community.getUser()))
+                    .content(communityComment.getCommunityCommentContent())
+                    .build();
+            commentList.add(comment);
+        }
+
+        return commentList;
+    }
+
     private User getUser(UserPrincipal userPrincipal) {
 //      return userRepository.findById(userPrincipal.getId())
 //                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
@@ -161,6 +182,11 @@ public class CommunityService {
         return userRepository.findById(1L)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
+    }
+
+    private Community getCommunity(Long postId) {
+        return communityRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
     }
 
 }

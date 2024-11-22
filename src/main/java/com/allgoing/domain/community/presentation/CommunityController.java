@@ -2,6 +2,7 @@ package com.allgoing.domain.community.presentation;
 
 import com.allgoing.domain.community.application.CommunityService;
 import com.allgoing.domain.community.dto.request.NewPostRequest;
+import com.allgoing.domain.community.dto.response.PostDetailResponse;
 import com.allgoing.global.config.security.token.CurrentUser;
 import com.allgoing.global.config.security.token.UserPrincipal;
 import com.allgoing.global.payload.Message;
@@ -55,18 +56,18 @@ public class CommunityController {
         return communityService.getPostList(userPrincipal);
     }
 
-//    @Operation(summary = "게시글 상세 조회 API", description = "정보/질문 게시판에서 특정 게시글의 내용을 조회하는 API입니다.")
-//    @ApiResponses(value = {
-//        @ApiResponse(responseCode = "200", description = "게시글 상세 조회 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = PostDetailResponse.class) ) } ),
-//        @ApiResponse(responseCode = "400", description = "게시글 상세 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
-//    })
-//    @GetMapping("/{postId}")
-//    public ResponseEntity<?> getPostDetail(
-//        @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
-//        @Parameter(description = "게시글 아이디를 입력해주세요.", required = true) @PathVariable Long postId
-//    ) {
-//        return communityService.getPostDetail(userPrincipal, postId);
-//    }
+    @Operation(summary = "게시글 상세 조회 API", description = "정보/질문 게시판에서 특정 게시글의 내용을 조회하는 API입니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "게시글 상세 조회 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = PostDetailResponse.class) ) } ),
+        @ApiResponse(responseCode = "400", description = "게시글 상세 조회 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @GetMapping("/{postId}")
+    public ResponseEntity<?> getPostDetail(
+        @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+        @Parameter(description = "게시글 아이디를 입력해주세요.", required = true) @PathVariable Long postId
+    ) {
+        return communityService.getPostDetail(userPrincipal, postId);
+    }
 
 
 
