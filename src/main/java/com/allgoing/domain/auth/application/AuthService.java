@@ -110,6 +110,12 @@ public class AuthService {
         User user = (User) userDetailsService.loadUserByUsername(userPrincipal.getUsername());
         String email = user.getEmail();
 
+        // 사용자 토큰 정보 삭제
+        Token token = tokenRepository.findByEmail(email);
+        if (token != null) {
+            tokenRepository.delete(token);
+        }
+
         // 사용자 정보 삭제
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isPresent()) {
