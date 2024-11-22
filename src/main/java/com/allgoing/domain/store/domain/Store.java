@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Setter;
 
 @Entity
 @Table(name="Store")
@@ -48,6 +49,10 @@ public class Store {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "traditional_id")
     private Traditional traditional;
+
+    @Setter
+    @Column(name = "star", nullable = false)
+    private Double star = 0.0; // 별점 기본값을 0으로 설정
 
     // 가게 소식
     @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)

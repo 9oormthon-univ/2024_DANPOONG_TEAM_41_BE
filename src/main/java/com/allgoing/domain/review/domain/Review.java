@@ -34,6 +34,9 @@ public class Review extends BaseEntity {
     @Column(name="like_count")
     private int likeCount;
 
+    @Column(name="star")
+    private int star;
+
     @Column(name="writer_name")
     private String writerName;
 
@@ -41,20 +44,31 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "store_id", nullable = false) // Store와 연결
     private Store store; // Store 필드 추가
 
-    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
     @OneToMany(mappedBy = "review", fetch = FetchType.LAZY)
     private List<ReviewComment> reviewComments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "review", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewLike> reviewLikes = new ArrayList<>();
 
     @Builder
-    public Review(User user, String reviewTitle, String reviewContent, int likeCount, String writerName, Store store) {
+    public Review(User user, String reviewTitle, String reviewContent, int likeCount, String writerName, Store store, int star) {
         this.user = user;
         this.reviewTitle = reviewTitle;
         this.reviewContent = reviewContent;
         this.likeCount = likeCount;
         this.writerName = writerName;
         this.store = store;
+        this.star = star;
+    }
+
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decrementLikeCount() {
+        this.likeCount--;
     }
 }
