@@ -123,6 +123,19 @@ public class ReservationService {
         return productDtoList;
     }
 
+    @Transactional
+    public void visitReservation(Long reservationId, Long userId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 예약 없음 id: " + reservationId));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 유저 없음: " + userId));
+
+        reservation.setReservationStatus(ReservationStatus.DONE);
+        reservationRepository.save(reservation);
+    }
+
+
     private ReservationResponse makeReservationResponse(Reservation reservation) {
         List<ReservationResponse.ProductResponse> products = reservation.getReservationProducts().stream()
                 .map(rp -> ReservationResponse.ProductResponse.builder()
@@ -142,5 +155,6 @@ public class ReservationService {
                 .products(products)
                 .build();
     }
+
 
 }

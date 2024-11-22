@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import lombok.Setter;
 
 @Entity
 @Table(name="Reservation")
@@ -33,6 +34,7 @@ public class Reservation extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name="reservation_status")
+    @Setter
     private ReservationStatus reservationStatus;
 
     @Column(name="reservation_date")
