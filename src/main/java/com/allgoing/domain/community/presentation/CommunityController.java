@@ -85,6 +85,21 @@ public class CommunityController {
         return communityService.createComment(userPrincipal, postId, newCommentRequest);
     }
 
+    @Operation(summary = "게시글 좋아요 수정 API", description = "정보/질문 게시판에서 특정 게시글에 좋아요를 등록/취소하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 댓글 작성 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "게시글 댓글 작성 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<?> like(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+            @Parameter(description = "게시글 아이디를 입력해주세요.", required = true) @PathVariable Long postId
+    ) {
+        return communityService.thumsUp(userPrincipal, postId);
+    }
+
+
+
 
 
 

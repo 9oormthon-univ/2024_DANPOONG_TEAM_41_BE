@@ -60,8 +60,6 @@ public class Community extends BaseEntity {
         this.likeCount++;
     }
 
-    public void decrementLikeCount() {
-        this.likeCount--;
-    }
+    public void decrementLikeCount() { this.likeCount--; }
 
 }

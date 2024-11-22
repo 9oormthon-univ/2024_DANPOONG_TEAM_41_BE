@@ -211,7 +211,46 @@ public class CommunityService {
 
     }
 
+    // 좋아요 수정 기능
+    @Transactional
+    public ResponseEntity<?> thumsUp(UserPrincipal userPrincipal, Long postId) {
+        User user = getUser(userPrincipal);
+        Community community = getCommunity(postId);
+        String message;
+        if(isLiked(user, community)) {
+            removeThumsUp(user, community);
+            message = "좋아요 취소 성공";
+        }
+        else {
+            addThumsUp(user, community);
+            message = "좋아요 등록 성공";
+        }
 
+        ApiResponse response = ApiResponse.builder()
+                .check(true)
+                .information(message)
+                .build();
+
+        return ResponseEntity.ok(response);
+
+    }
+
+    // 좋아요 추가
+    private void addThumsUp(User user, Community community) {
+        CommunityLike communityLike = CommunityLike.builder()
+                .user(user)
+                .community(community)
+                .build();
+        communityLikeRepository.save(communityLike);
+        community.incrementLikeCount();
+    }
+
+    // 좋아요 취소
+    private void removeThumsUp(User user, Community community) {
+        CommunityLike communityLike = communityLikeRepository.findByUserAndCommunity(user, community);
+        communityLikeRepository.delete(communityLike);
+        community.decrementLikeCount();
+    }
 
     private User getUser(UserPrincipal userPrincipal) {
 //      return userRepository.findById(userPrincipal.getId())
