@@ -98,6 +98,30 @@ public class CatService {
 
     }
 
+    @Transactional
+    public void plusExp(Cat cat, Long exp) {
+        cat.plusExp(exp); // 현재 경험치 추가
+        checkLevelUp(cat); // 레벨업 확인 및 처리
+        catRepository.save(cat); // 변경사항 저장
+    }
+
+    private void checkLevelUp(Cat cat) {
+        long currentExp = cat.getCatExp();
+        int currentLevel = cat.getLevel();
+
+        while (currentExp >= getRequiredExp(currentLevel)) {
+            currentExp -= getRequiredExp(currentLevel); // 경험치 소모
+            currentLevel++; // 레벨 상승
+        }
+
+        // 최종 레벨과 남은 경험치 업데이트
+        cat.updateLevel(currentLevel);
+        cat.updateExp(currentExp);
+    }
+
+    private long getRequiredExp(int level) {
+        return level + 4; // 레벨업 기준 경험치 계산
+    }
 
     private Cat getCatbyUser(UserPrincipal userPrincipal) {
         // User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));

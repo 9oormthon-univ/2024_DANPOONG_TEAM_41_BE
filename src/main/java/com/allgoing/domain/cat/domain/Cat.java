@@ -48,4 +48,16 @@ public class Cat {
         this.coin -= l;
     }
 
+
+    public void updateLevel(int newLevel) {
+        this.level = newLevel;
+    }
+
+    public void updateExp(Long exp) {
+        this.catExp = exp;
+    }
+
+    public void plusExp(Long exp) {
+        this.catExp += exp;
+    }
 }
