@@ -105,4 +105,23 @@ public class AuthService {
 
         return ResponseEntity.ok(apiResponse);
     }
+
+    public ResponseEntity<?> exit(UserPrincipal userPrincipal) {
+        User user = (User) userDetailsService.loadUserByUsername(userPrincipal.getUsername());
+        String email = user.getEmail();
+
+        // 사용자 정보 삭제
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent()) {
+            User deleteUser = userOptional.get();
+            userRepository.delete(deleteUser);
+        }
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information("회원 탈퇴 성공")
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
 }

@@ -17,10 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -65,6 +62,16 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@Parameter @CurrentUser UserPrincipal userPrincipal) {
         return authService.logout(userPrincipal);
+    }
+
+    @Operation(summary = "탈퇴하기 API", description = "탈퇴하기 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "탈퇴하기 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "탈퇴하기 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @DeleteMapping("/exit")
+    public ResponseEntity<?> exit(@Parameter @CurrentUser UserPrincipal userPrincipal) {
+        return authService.exit(userPrincipal);
     }
 
 }
