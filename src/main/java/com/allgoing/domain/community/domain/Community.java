@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name="Commnuity")
+@Table(name="Community")
 @NoArgsConstructor
 @Getter
 public class Community extends BaseEntity {
