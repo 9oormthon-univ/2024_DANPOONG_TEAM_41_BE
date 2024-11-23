@@ -94,10 +94,7 @@ public class AuthService {
         String email = user.getEmail();
 
         // 토큰 정보 삭제
-        Token token = tokenRepository.findByEmail(email);
-        if (token != null) {
-            tokenRepository.delete(token);
-        }
+        deleteToken(email);
 
         ApiResponse apiResponse = ApiResponse.builder()
                 .check(true)
@@ -112,10 +109,7 @@ public class AuthService {
         String email = user.getEmail();
 
         // 사용자 토큰 정보 삭제
-        Token token = tokenRepository.findByEmail(email);
-        if (token != null) {
-            tokenRepository.delete(token);
-        }
+        deleteToken(email);
 
         // 사용자 정보 삭제
         Optional<User> userOptional = userRepository.findByEmail(email);
@@ -130,5 +124,13 @@ public class AuthService {
                 .build();
 
         return ResponseEntity.ok(apiResponse);
+    }
+
+
+    private void deleteToken(String email) {
+        Token token = tokenRepository.findByEmail(email);
+        if (token != null) {
+            tokenRepository.delete(token);
+        }
     }
 }
