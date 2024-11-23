@@ -19,14 +19,20 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Spring Security에서 username을 이름으로 간주
-        log.info("Loading user by name: {}", username);
+        log.info("Attempting to load user by username: {}", username);
         return loadUserByName(username);
     }
 
     public UserDetails loadUserByName(String name) throws UsernameNotFoundException {
-        User user = userRepository.findByName(name) // 이름으로 사용자 검색
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with name: " + name));
-        return UserPrincipal.create(user);
+        log.info("Searching for user by name: {}", name);
+        return userRepository.findByName(name)
+                .map(user -> {
+                    log.info("User found: {}", user);
+                    return UserPrincipal.create(user);
+                })
+                .orElseThrow(() -> {
+                    log.warn("User not found with name: {}", name);
+                    return new UsernameNotFoundException("User not found with name: " + name);
+                });
     }
 }

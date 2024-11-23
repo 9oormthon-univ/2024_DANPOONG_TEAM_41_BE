@@ -41,14 +41,20 @@ public class IdTokenVerifier {
             headers.set("Authorization", "Bearer " + idToken);
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
+            log.info("Requesting user info from Kakao with ID token");
             // 카카오 사용자 정보 요청
             ResponseEntity<String> response = restTemplate.postForEntity(kakaoUserInfoUri, entity, String.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("Kakao response received successfully");
                 JsonNode userInfo = objectMapper.readTree(response.getBody());
                 String tokenEmail = userInfo.path("kakao_account").path("email").asText();
+                log.info("Extracted email from Kakao response: {}", tokenEmail);
+
                 // 사용자 정보 확인
                 if (tokenEmail == null || tokenEmail.isEmpty()) {
+
+                    log.warn("Email mismatch. Token email: {}, Expected email: {}", tokenEmail, email);
                     logger.error("Kakao 계정에서 이메일을 찾을 수 없습니다.");
                     throw new IllegalArgumentException("ID 토큰에서 이메일을 추출할 수 없습니다.");
                 }
@@ -58,8 +64,9 @@ public class IdTokenVerifier {
                     throw new IllegalArgumentException("ID 토큰의 이메일과 요청된 이메일이 일치하지 않습니다.");
                 }
 
-                String nickname = userInfo.path("properties").path("nickname").asText();
 
+                String nickname = userInfo.path("properties").path("nickname").asText();
+                log.info("Kakao nickname: {}", nickname);
                 return nickname;
             } else {
                 logger.error("ID 토큰 검증 실패: HTTP 상태 " + response.getStatusCode());

@@ -44,27 +44,29 @@ public class CustomOncePerRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String jwt = getJwtFromRequest(request);
+        log.info("Incoming request to [{}], JWT: {}", request.getRequestURI(), jwt);
 
         if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            String username = null;
             try {
-                username = jwtTokenUtil.getUsernameFromJWT(jwt);
-            } catch (ExpiredJwtException ex) {
-                String refreshToken = getRefreshTokenFromRequest(request);
-                if (refreshToken != null && jwtTokenUtil.validateRefreshToken(refreshToken)) {
-                    String newAccessToken = jwtTokenUtil.generateToken(new HashMap<>(), jwtTokenUtil.getUsernameFromRefreshToken(refreshToken));
-                    response.setHeader("Authorization", "Bearer " + newAccessToken);
-                    username = jwtTokenUtil.getUsernameFromJWT(newAccessToken);
-                }
-            }
+                log.info("Attempting to authenticate with JWT: {}", jwt);
+                String username = jwtTokenUtil.getUsernameFromJWT(jwt);
+                log.info("Extracted username from JWT: {}", username);
 
-            if (username != null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 if (jwtTokenUtil.validateToken(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.info("Authentication successful for user: {}", username);
+                } else {
+                    log.warn("JWT validation failed for token: {}", jwt);
                 }
+            } catch (ExpiredJwtException ex) {
+                log.warn("JWT expired: {}", ex.getMessage());
+                handleExpiredToken(ex, request, response);
+            } catch (Exception ex) {
+                log.error("Error processing JWT: {}", ex.getMessage(), ex);
             }
         }
 

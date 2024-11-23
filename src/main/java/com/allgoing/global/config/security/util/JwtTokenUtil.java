@@ -1,6 +1,7 @@
 package com.allgoing.global.config.security.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -38,6 +39,7 @@ public class JwtTokenUtil {
     }
 
     public String generateRefreshToken(Map<String, Object> claims, String subject) {
+        log.info("Generating new JWT for subject: {}", subject);
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
@@ -70,8 +72,15 @@ public class JwtTokenUtil {
 
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        final String username = getSubjectFromJWT(token); // JWT에서 subject 추출
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        try {
+            String username = getUsernameFromJWT(token);
+            boolean isValid = username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+            log.info("Token validation result for [{}]: {}", username, isValid);
+            return isValid;
+        } catch (Exception ex) {
+            log.warn("Token validation failed: {}", ex.getMessage());
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {
@@ -94,11 +103,18 @@ public class JwtTokenUtil {
     }
 
     public String getUsernameFromJWT(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(jwtSecret)
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.getSubject();
+        try {
+            Claims claims = getAllClaimsFromToken(token);
+            String username = claims.getSubject();
+            log.info("Extracted username [{}] from JWT", username);
+            return username;
+        } catch (ExpiredJwtException ex) {
+            log.warn("JWT is expired: {}", ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Failed to extract username from JWT: {}", ex.getMessage());
+            throw ex;
+        }
     }
 
     public String getUsernameFromRefreshToken(String token) {
