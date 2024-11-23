@@ -29,11 +29,11 @@ public class Cat {
     @Column(name="coin")
     private Long coin;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 
-    @OneToMany(mappedBy = "cat", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "cat", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CatItem> catItems = new ArrayList<>();
 
     @Builder
