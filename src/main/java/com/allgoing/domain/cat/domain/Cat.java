@@ -1,6 +1,5 @@
 package com.allgoing.domain.cat.domain;
 
-import com.allgoing.domain.item.domain.Item;
 import com.allgoing.domain.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -59,5 +58,9 @@ public class Cat {
 
     public void plusExp(Long exp) {
         this.catExp += exp;
+    }
+
+    public void addCoins(int coins) {
+        this.coin += coins;
     }
 }
