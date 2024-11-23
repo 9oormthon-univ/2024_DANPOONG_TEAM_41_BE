@@ -51,7 +51,7 @@ public class IdTokenVerifier {
 
                 String nickname = userInfo.path("properties").path("nickname").asText();
 
-                return tokenEmail;
+                return nickname;
             } else {
                 logger.error("ID 토큰 검증 실패: HTTP 상태 " + response.getStatusCode());
                 throw new RuntimeException("ID 토큰 검증 실패");
