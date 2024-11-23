@@ -5,6 +5,7 @@ import com.allgoing.domain.review.domain.Review;
 import com.allgoing.domain.review.domain.ReviewImage;
 import com.allgoing.domain.review.dto.ReviewImageDto;
 import com.allgoing.domain.review.dto.response.StoreReviewResponse;
+import com.allgoing.domain.store.domain.StoreInfo;
 import com.allgoing.domain.store.dto.request.StoreCreatRequest;
 import com.allgoing.domain.store.dto.response.StoreHomeResponse;
 import com.allgoing.domain.store.dto.response.StoreListResponse;
@@ -15,6 +16,7 @@ import com.allgoing.domain.store.domain.StoreImage;
 import com.allgoing.domain.store.dto.StoreImageDto;
 import com.allgoing.domain.store.dto.StoreInfoDto;
 import com.allgoing.domain.store.repository.StoreImageRepository;
+import com.allgoing.domain.store.repository.StoreInfoReposiory;
 import com.allgoing.domain.store.repository.StoreRepository;
 import com.allgoing.domain.traditional.repository.TraditionalRepository;
 import com.allgoing.global.util.S3Util;
@@ -36,6 +38,7 @@ public class StoreService {
     private final TraditionalRepository traditionalRepository;
     private final S3Util s3Util;
     private final StoreImageRepository storeImageRepository;
+    private final StoreInfoReposiory storeInfoReposiory;
 
     public List<StoreListResponse> getAllStores() {
         List<Store> stores = storeRepository.findAll();
@@ -194,7 +197,7 @@ public class StoreService {
 
     public void creatStore(StoreCreatRequest store, List<MultipartFile> files) {
 
-
+        // Store 엔티티 생성
         Store savingStore = Store.builder()
                 .storeName(store.getStoreName())
                 .storeIntro(store.getStoreIntro())
@@ -204,24 +207,34 @@ public class StoreService {
                 .storePhone(store.getStorePhone())
                 .traditional(traditionalRepository.findById(store.getTraditionalId())
                         .orElseThrow(() -> new IllegalArgumentException("해당하는 전통시장이 없습니다! ID: " + store.getTraditionalId())))
+                .star(0.0)
                 .build();
-
         Store savedStore = storeRepository.save(savingStore);
 
         if (files != null && !files.isEmpty()) {
             for (MultipartFile file : files) {
                 if (file != null && !file.isEmpty()) {
                     String imageUrl = s3Util.upload(file);
-
+                    System.out.println(imageUrl);
                     StoreImage storeImage = StoreImage.builder()
                             .storeImageUrl(imageUrl)
                             .store(savedStore)
                             .build();
-
+                    System.out.println(storeImage.getStoreImageUrl());
                     storeImageRepository.save(storeImage);
                 }
             }
         }
+
+        List<StoreInfo> list = store.getStoreInfos().stream()
+                .map(storeInfoDto -> StoreInfo.builder()
+                        .day(storeInfoDto.getDay())
+                        .isOpen(storeInfoDto.isOpen())
+                        .openTime(storeInfoDto.getOpenTime())
+                        .closeTime(storeInfoDto.getCloseTime())
+                        .store(savedStore).build()).toList();
+
+        storeInfoReposiory.saveAll(list);
 
     }
 }

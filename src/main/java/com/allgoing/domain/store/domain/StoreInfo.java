@@ -1,6 +1,8 @@
 package com.allgoing.domain.store.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +12,8 @@ import java.time.LocalTime;
 @Table(name="StoreInfo")
 @NoArgsConstructor
 @Getter
+@AllArgsConstructor
+@Builder
 public class StoreInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
