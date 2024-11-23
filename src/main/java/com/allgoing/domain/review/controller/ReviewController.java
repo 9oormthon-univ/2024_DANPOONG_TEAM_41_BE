@@ -96,7 +96,6 @@ public class ReviewController {
     @GetMapping("/detail/{reviewId}")
     public ResponseEntity<ApiResponse> detailReview(@PathVariable Long reviewId) {
         try {
-            //임시로 1번 유저를 받음
             ReviewDto reviewDto = reviewService.detailReview(reviewId, 1L);
             return ResponseEntity.ok(
                     ApiResponse.builder()
