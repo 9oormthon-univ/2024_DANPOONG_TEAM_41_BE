@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name="Commnuity")
+@Table(name="Community")
 @NoArgsConstructor
 @Getter
 public class Community extends BaseEntity {
@@ -60,8 +60,6 @@ public class Community extends BaseEntity {
         this.likeCount++;
     }
 
-    public void decrementLikeCount() {
-        this.likeCount--;
-    }
+    public void decrementLikeCount() { this.likeCount--; }
 
 }
