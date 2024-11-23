@@ -65,11 +65,12 @@ public class AuthService {
                         .profileImage(null)
                         .build();
                 userRepository.save(user);
+
+                // 고양이 객체 생성
+                Cat cat = Cat.builder().build();
+                catRepository.save(cat);
             }
 
-            // 고양이 객체 생성
-            Cat cat = Cat.builder().build();
-            catRepository.save(cat);
 
             LoginResponse loginResponse = LoginResponse.builder()
                     .accessToken(accessToken)
