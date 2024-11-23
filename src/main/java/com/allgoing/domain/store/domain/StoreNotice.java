@@ -25,7 +25,7 @@ public class StoreNotice extends BaseEntity {
     @Column(name="store_notice_content")
     private String storeNoticeContent;
 
-    @OneToMany(mappedBy = "storeNotice", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<StoreImage> storeNoticeImages = new ArrayList<>();
+//    @OneToMany(mappedBy = "storeNotice", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    private List<StoreImage> storeNoticeImages = new ArrayList<>();
 
 }
