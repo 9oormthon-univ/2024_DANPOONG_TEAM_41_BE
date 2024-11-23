@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="Commnuity_Image")
+@Table(name="Community_Image")
 @NoArgsConstructor
 @Getter
 public class CommunityImage {
