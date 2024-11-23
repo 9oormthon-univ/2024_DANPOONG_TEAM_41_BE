@@ -113,6 +113,7 @@ public class CatService {
         while (currentExp >= getRequiredExp(currentLevel)) {
             currentExp -= getRequiredExp(currentLevel); // 경험치 소모
             currentLevel++; // 레벨 상승
+            getCoin(cat, currentLevel); // 레벨업 보상
         }
 
         // 최종 레벨과 남은 경험치 업데이트
@@ -122,6 +123,22 @@ public class CatService {
 
     private long getRequiredExp(int level) {
         return level + 4; // 레벨업 기준 경험치 계산
+    }
+
+    private void getCoin(Cat cat, int level) {
+        // 레벨에 따른 보상 코인 계산
+        int coinReward;
+        if (level >= 1 && level <= 8) {
+            coinReward = 5000;
+        } else if (level >= 9 && level <= 19) {
+            coinReward = 10000;
+        } else if (level == 20) {
+            coinReward = 15000;
+        } else {
+            coinReward = 0; // 예외 처리
+        }
+        // 보상 지급
+        cat.addCoins(coinReward);
     }
 
     private Cat getCatbyUser(UserPrincipal userPrincipal) {
