@@ -2,7 +2,12 @@ package com.allgoing.domain.auth.application;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,12 +18,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.security.Key;
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class IdTokenVerifier {
 
     @Value("${app.auth.kakao.userInfoUri}")
     private String kakaoUserInfoUri;
+    @Value("${app.auth.tokenSecret}")
+    private String jwtSecret;
 
     private static final Logger logger = LoggerFactory.getLogger(IdTokenVerifier.class);
     private final ObjectMapper objectMapper;
@@ -67,6 +76,38 @@ public class IdTokenVerifier {
         } catch (Exception e) {
             logger.error("ID 토큰 검증 실패", e);
             throw new RuntimeException("ID 토큰 검증 실패", e);
+        }
+    }
+    public Claims verifyAndExtractClaims(String idToken) {
+        try {
+            // Signing key 생성
+            Key signingKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+
+            // JWT 검증 및 Claims 추출
+            return Jwts.parserBuilder()
+                    .setSigningKey(signingKey)
+                    .build()
+                    .parseClaimsJws(idToken)
+                    .getBody();
+        } catch (JwtException ex) {
+            // 검증 실패 시 로그 기록 및 예외 처리
+            log.error("Invalid ID token: {}", ex.getMessage(), ex);
+            throw new IllegalArgumentException("Invalid ID token", ex);
+        }
+    }
+
+    public String verifyAndExtractSubject(String idToken) {
+        Claims claims = verifyAndExtractClaims(idToken);
+        return claims.getSubject();
+    }
+
+    public boolean isValid(String idToken) {
+        try {
+            verifyAndExtractClaims(idToken);
+            return true; // 검증 성공 시 true 반환
+        } catch (IllegalArgumentException ex) {
+            log.warn("Invalid ID token: {}", ex.getMessage());
+            return false; // 검증 실패 시 false 반환
         }
     }
 }
