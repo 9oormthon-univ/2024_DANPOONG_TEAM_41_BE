@@ -16,10 +16,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -37,6 +38,9 @@ public class AuthController {
     public ResponseEntity<?> idTokenLogin(@RequestBody SigninReq signinReq) {
         String accessToken = signinReq.getAccessToken();
         String email = signinReq.getEmail();
+
+        log.info("accessToken: {}", accessToken);
+        log.info("email: {}", email);
 
         if (accessToken == null || accessToken.trim().isEmpty()) {
             return ResponseEntity.badRequest().body("ID 토큰은 null이거나 비어 있을 수 없습니다");
