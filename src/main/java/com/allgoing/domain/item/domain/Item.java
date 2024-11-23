@@ -27,7 +27,7 @@ public class Item {
     @Column(name="item_price")
     private Long itemPrice;
 
-    @OneToMany(mappedBy = "item")
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CatItem> catItems;
 
 }
