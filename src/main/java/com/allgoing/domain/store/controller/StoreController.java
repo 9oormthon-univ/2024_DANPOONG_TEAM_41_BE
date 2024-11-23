@@ -1,6 +1,8 @@
 package com.allgoing.domain.store.controller;
 
+import com.allgoing.domain.review.dto.request.ReviewRequestDto;
 import com.allgoing.domain.review.dto.response.StoreReviewResponse;
+import com.allgoing.domain.store.dto.request.StoreCreatRequest;
 import com.allgoing.domain.store.dto.response.StoreHomeResponse;
 import com.allgoing.domain.store.dto.response.StoreNoticeResponse;
 import com.allgoing.domain.store.dto.response.StoreSummaryResponse;
@@ -17,8 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "store", description = "가게 관련 API")
 @Slf4j
@@ -125,6 +131,29 @@ public class StoreController {
                     ApiResponse.builder()
                             .check(true)
                             .information(storeReviewList)
+                            .build()
+            );
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(404).body(
+                    ApiResponse.builder()
+                            .check(false)
+                            .information(ErrorResponse.of(ErrorCode.INVALID_CHECK, e.getMessage()))
+                            .build()
+            );
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<?> creatStore(
+            @RequestPart(value = "store") StoreCreatRequest store,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+        try {
+            storeService.creatStore(store, files);
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .check(true)
+                            .information("Store created successfully")
                             .build()
             );
         } catch (Exception e) {

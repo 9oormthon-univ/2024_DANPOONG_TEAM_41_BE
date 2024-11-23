@@ -1,6 +1,7 @@
 package com.allgoing.domain.store.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,9 +19,9 @@ public class StoreImage {
     @JoinColumn(name = "store_id")
     private Store store;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_notice_id")
-    private StoreNotice storeNotice;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "store_notice_id")
+//    private StoreNotice storeNotice;
 
     @Column(name="store_image_url")
     private String storeImageUrl;
@@ -29,5 +30,10 @@ public class StoreImage {
     @Column(name="store_image_type")
     private StoreImageType storeImageType;
 
-
+    @Builder
+    public StoreImage(Store store, String storeImageUrl) {
+        this.store = store;
+        this.storeImageType = StoreImageType.MAIN;
+        this.storeImageUrl = storeImageUrl;
+    }
 }

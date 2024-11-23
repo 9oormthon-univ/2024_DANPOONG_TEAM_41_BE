@@ -5,6 +5,8 @@ import com.allgoing.domain.reservation.domain.Reservation;
 import com.allgoing.domain.review.domain.Review;
 import com.allgoing.domain.traditional.domain.Traditional;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +18,8 @@ import lombok.Setter;
 @Table(name="Store")
 @NoArgsConstructor
 @Getter
+@AllArgsConstructor
+@Builder
 public class Store {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -77,6 +81,4 @@ public class Store {
     // 상품
     @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
-
-
 }
