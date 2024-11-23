@@ -70,6 +70,20 @@ public class CommunityController {
         return communityService.getPostDetail(userPrincipal, postId);
     }
 
+    @Operation(summary = "게시물 삭제 API", description = "정보/질문 게시판에서 내가 게시한 글을 삭제하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 삭제 성공", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class) ) } ),
+            @ApiResponse(responseCode = "400", description = "게시글 삭제 실패", content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) ) } ),
+    })
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<?> deletePost(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+            @Parameter(description = "게시글 아이디를 입력해주세요.", required = true) @PathVariable Long postId
+    ) {
+        return communityService.deletePost(userPrincipal, postId);
+    }
+
+
 
     @Operation(summary = "게시글 댓글 작성 API", description = "정보/질문 게시판에서 특정 게시글에 댓글을 작성하는 API입니다.")
     @ApiResponses(value = {

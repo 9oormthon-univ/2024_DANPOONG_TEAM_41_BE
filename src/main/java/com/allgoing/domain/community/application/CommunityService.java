@@ -350,6 +350,30 @@ public class CommunityService {
         return ResponseEntity.ok(response);
     }
 
+    @Transactional
+    public ResponseEntity<?> deletePost(UserPrincipal userPrincipal, Long postId) {
+        User user = getUser(userPrincipal);
+        Community community = getCommunity(postId);
+
+        if(!community.getUser().equals(user)) {
+            ApiResponse response = ApiResponse.builder()
+                    .check(false)
+                    .information("게시글 삭제 권한이 없습니다.")
+                    .build();
+
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        communityRepository.delete(community);
+
+        ApiResponse response = ApiResponse.builder()
+                .check(true)
+                .information("게시글 삭제 성공")
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
     private User getUser(UserPrincipal userPrincipal) {
 //      return userRepository.findById(userPrincipal.getId())
 //                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
