@@ -7,8 +7,11 @@ import com.allgoing.domain.product.dto.ProductDto;
 import com.allgoing.domain.reservation.dto.request.ReservationRequest;
 import com.allgoing.domain.reservation.dto.response.ReservationResponse;
 import com.allgoing.domain.reservation.service.ReservationService;
+import com.allgoing.global.config.security.token.CurrentUser;
+import com.allgoing.global.config.security.token.UserPrincipal;
 import com.allgoing.global.payload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -74,10 +77,12 @@ public class ReservationController {
     //예약하기
     @Operation(summary = "예약하기", description = "예약하기")
     @PostMapping("/{storeId}")
-    public ResponseEntity<?> makeReservation(@RequestBody ReservationRequest reservationRequest, @PathVariable Long storeId) {
+    public ResponseEntity<?> makeReservation(@Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+                                             @RequestBody ReservationRequest reservationRequest,
+                                             @PathVariable Long storeId) {
         try {
 //            reservationService.makeReservation(storeId, userId);
-            reservationService.makeReservation(reservationRequest, storeId, 1L);
+            reservationService.makeReservation(reservationRequest, storeId, userPrincipal);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)
@@ -98,11 +103,12 @@ public class ReservationController {
     //예약 취소
     @Operation(summary = "예약 취소", description = "예약 취소")
     @PatchMapping("/{reservationId}")
-    public ResponseEntity<?> cancelReservation(@PathVariable Long reservationId) {
+    public ResponseEntity<?> cancelReservation(@Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+                                               @PathVariable Long reservationId) {
         try {
             //임시로 1번 유저 사용
 //            reservationService.makeReservation(storeId, userId);
-            reservationService.cancelReservation(reservationId, 1L);
+            reservationService.cancelReservation(reservationId, userPrincipal);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)
@@ -123,11 +129,12 @@ public class ReservationController {
     //예약 후 방문완료 처리
     @Operation(summary = "예약 후 방문완료 처리", description = "예약 후 방문완료 처리(로그인 기능 적용 전이므로 1번유저 고정)")
     @PostMapping("/visited/{reservationId}")
-    public ResponseEntity<?> visit(@PathVariable Long reservationId) {
+    public ResponseEntity<?> visit(@Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+                                   @PathVariable Long reservationId) {
         try {
             //임시로 1번 유저 사용
 //            reservationService.makeReservation(storeId, userId);
-            ExpResponse expResponse = reservationService.visitReservation(reservationId, 1L);
+            ExpResponse expResponse = reservationService.visitReservation(reservationId, userPrincipal);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)
@@ -148,11 +155,11 @@ public class ReservationController {
     //내 예약 내역 보기
     @Operation(summary = "내 예약 내역 보기", description = "내 예약 내역 보기")
     @GetMapping("/my")
-    public ResponseEntity<?> getMyReservations() {
+    public ResponseEntity<?> getMyReservations(@Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal) {
         try {
             //임시로 1번 유저 사용
 //            reservationService.makeReservation(storeId, userId);
-            List<ReservationResponse> myReservations = reservationService.getMyReservations(1L);
+            List<ReservationResponse> myReservations = reservationService.getMyReservations(userPrincipal);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)
