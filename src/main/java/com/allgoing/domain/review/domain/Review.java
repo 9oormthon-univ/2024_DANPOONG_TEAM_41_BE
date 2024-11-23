@@ -1,6 +1,7 @@
 package com.allgoing.domain.review.domain;
 
 import com.allgoing.domain.common.BaseEntity;
+import com.allgoing.domain.common.Status;
 import com.allgoing.domain.store.domain.Store;
 import com.allgoing.domain.user.domain.User;
 import jakarta.persistence.*;
@@ -37,9 +38,6 @@ public class Review extends BaseEntity {
     @Column(name="star")
     private int star;
 
-    @Column(name="writer_name")
-    private String writerName;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false) // Store와 연결
     private Store store; // Store 필드 추가
@@ -54,14 +52,21 @@ public class Review extends BaseEntity {
     private List<ReviewLike> reviewLikes = new ArrayList<>();
 
     @Builder
-    public Review(User user, String reviewTitle, String reviewContent, int likeCount, String writerName, Store store, int star) {
+    public Review(User user, String reviewTitle, String reviewContent, int likeCount, Store store, int star) {
         this.user = user;
         this.reviewTitle = reviewTitle;
         this.reviewContent = reviewContent;
         this.likeCount = likeCount;
-        this.writerName = writerName;
         this.store = store;
         this.star = star;
+    }
+    
+    public String getWriterName(){
+        if (this.getUser().getStatus() == Status.ACTIVE){
+            return user.getName();
+        }else{
+            return "탈퇴한 유저";
+        }
     }
 
     public void incrementLikeCount() {
