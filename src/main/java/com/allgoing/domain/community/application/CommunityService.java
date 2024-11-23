@@ -401,9 +401,7 @@ public class CommunityService {
     }
 
     private User getUser(UserPrincipal userPrincipal) {
-//      return userRepository.findById(userPrincipal.getId())
-//                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        return userRepository.findById(1L)
+      return userRepository.findById(userPrincipal.getId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 
