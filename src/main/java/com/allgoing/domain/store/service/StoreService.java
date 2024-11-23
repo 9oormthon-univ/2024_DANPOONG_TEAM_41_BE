@@ -215,12 +215,10 @@ public class StoreService {
             for (MultipartFile file : files) {
                 if (file != null && !file.isEmpty()) {
                     String imageUrl = s3Util.upload(file);
-                    System.out.println(imageUrl);
                     StoreImage storeImage = StoreImage.builder()
                             .storeImageUrl(imageUrl)
                             .store(savedStore)
                             .build();
-                    System.out.println(storeImage.getStoreImageUrl());
                     storeImageRepository.save(storeImage);
                 }
             }
