@@ -6,9 +6,12 @@ import com.allgoing.domain.review.dto.ReviewDto;
 import com.allgoing.domain.review.dto.request.ReviewRequestDto;
 import com.allgoing.domain.review.service.ReviewService;
 import com.allgoing.domain.user.domain.repository.UserRepository;
+import com.allgoing.global.config.security.token.CurrentUser;
+import com.allgoing.global.config.security.token.UserPrincipal;
 import com.allgoing.global.payload.ApiResponse;
 import com.allgoing.global.util.S3Util;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +42,7 @@ public class ReviewController {
     @Operation(summary = "리뷰 작성", description = "리뷰 작성 요청(로그인 기능 적용 전이므로 1번유저 고정)")
     @PostMapping("/create/{storeId}")
     public ResponseEntity<ApiResponse> createReview(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
             @PathVariable Long storeId,
             @Validated @RequestPart(value = "review") ReviewRequestDto.Review review,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
@@ -52,7 +56,7 @@ public class ReviewController {
             );
         }
         try {
-            ExpResponse catExp = reviewService.createReview(review, 1L, storeId, files);
+            ExpResponse catExp = reviewService.createReview(review, userPrincipal, storeId, files);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)
@@ -72,9 +76,11 @@ public class ReviewController {
 
     @Operation(summary = "리뷰 삭제", description = "리뷰 삭제 요청(로그인 기능 적용 전이므로 1번유저 고정)")
     @DeleteMapping("/delete/{reviewId}")
-    public ResponseEntity<ApiResponse> deleteReview(@PathVariable Long reviewId) {
+    public ResponseEntity<ApiResponse> deleteReview(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+            @PathVariable Long reviewId) {
         try {
-            reviewService.deleteReview(reviewId, 1L);
+            reviewService.deleteReview(reviewId, userPrincipal);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)
@@ -94,9 +100,11 @@ public class ReviewController {
 
     @Operation(summary = "리뷰 상세보기", description = "리뷰 상세보기 요청")
     @GetMapping("/detail/{reviewId}")
-    public ResponseEntity<ApiResponse> detailReview(@PathVariable Long reviewId) {
+    public ResponseEntity<ApiResponse> detailReview(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+            @PathVariable Long reviewId) {
         try {
-            ReviewDto reviewDto = reviewService.detailReview(reviewId, 1L);
+            ReviewDto reviewDto = reviewService.detailReview(reviewId, userPrincipal);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)
@@ -116,10 +124,12 @@ public class ReviewController {
 
     @Operation(summary = "시장 전체 가게의 리뷰 보기", description = "시장 전체 가게의 리뷰 보기 요청")
     @GetMapping("/traditional/{traditionalId}")
-    public ResponseEntity<ApiResponse> traditionalReview(@PathVariable Long traditionalId) {
+    public ResponseEntity<ApiResponse> traditionalReview(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+            @PathVariable Long traditionalId) {
         try {
             //임시로 1번 유저를 받음
-            List<ReviewDto> reviewDtoList = reviewService.traditionalReview(traditionalId, 1L);
+            List<ReviewDto> reviewDtoList = reviewService.traditionalReview(traditionalId, userPrincipal);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)
@@ -139,9 +149,9 @@ public class ReviewController {
 
     @Operation(summary = "내가 쓴 리뷰 보기", description = "내가 쓴 리뷰 보기(로그인 기능 적용 전이므로 1번유저 고정)")
     @GetMapping("/myreview")
-    public ResponseEntity<ApiResponse> myReview() {
+    public ResponseEntity<ApiResponse> myReview(@Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal) {
         try {
-            List<ReviewDto> reviewDtoList = reviewService.myReview(1L);
+            List<ReviewDto> reviewDtoList = reviewService.myReview(userPrincipal);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)
@@ -161,9 +171,11 @@ public class ReviewController {
 
     @Operation(summary = "리뷰 좋아요 하기", description = "리뷰 좋아요 요청(로그인 기능 적용 전이므로 1번유저 고정)")
     @PostMapping("/like/{reviewId}")
-    public ResponseEntity<ApiResponse> likeReview(@PathVariable Long reviewId) {
+    public ResponseEntity<ApiResponse> likeReview(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+            @PathVariable Long reviewId) {
         try {
-            reviewService.likeReview(reviewId, 1L);
+            reviewService.likeReview(reviewId, userPrincipal);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)
@@ -183,9 +195,11 @@ public class ReviewController {
 
     @Operation(summary = "리뷰 좋아요 취소", description = "리뷰 좋아요 취소(로그인 기능 적용 전이므로 1번유저 고정)")
     @DeleteMapping("/like/{reviewId}")
-    public ResponseEntity<ApiResponse> unlikeReview(@PathVariable Long reviewId) {
+    public ResponseEntity<ApiResponse> unlikeReview(
+            @Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal,
+            @PathVariable Long reviewId) {
         try {
-            reviewService.unlikeReview(reviewId, 1L);
+            reviewService.unlikeReview(reviewId, userPrincipal);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)
@@ -205,9 +219,9 @@ public class ReviewController {
 
     @Operation(summary = "좋아요 한 리뷰 보기", description = "좋아요 한 리뷰 보기(로그인 기능 적용 전이므로 1번유저 고정)")
     @GetMapping("/like")
-    public ResponseEntity<ApiResponse> likeReviewList() {
+    public ResponseEntity<ApiResponse> likeReviewList(@Parameter(description = "Access Token을 입력해주세요.", required = true) @CurrentUser UserPrincipal userPrincipal) {
         try {
-            List<ReviewDto> reviewDtos = reviewService.likeReviewList(1L);
+            List<ReviewDto> reviewDtos = reviewService.likeReviewList(userPrincipal);
             return ResponseEntity.ok(
                     ApiResponse.builder()
                             .check(true)

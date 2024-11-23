@@ -10,6 +10,8 @@ import com.allgoing.domain.item.domain.repository.ItemRepository;
 import com.allgoing.domain.item.dto.response.CategoryItemListResponse;
 import com.allgoing.domain.item.dto.response.CategoryItemResponse;
 import com.allgoing.domain.item.dto.response.CoinResponse;
+import com.allgoing.domain.user.domain.User;
+import com.allgoing.domain.user.domain.repository.UserRepository;
 import com.allgoing.global.config.security.token.UserPrincipal;
 import com.allgoing.global.payload.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class ItemService {
     private final CatRepository catRepository;
     private final ItemRepository itemRepository;
     private final CatItemRepository catItemRepository;
+    private final UserRepository userRepository;
 
     public ResponseEntity<?> getCategoryItems(UserPrincipal userPrincipal) {
         Cat cat = getCatbyUser(userPrincipal);
@@ -121,9 +124,8 @@ public class ItemService {
 
 
     private Cat getCatbyUser(UserPrincipal userPrincipal) {
-        // User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        // return catRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
-        return catRepository.findByUserId(1L).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+        User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        return catRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
     }
 
 }

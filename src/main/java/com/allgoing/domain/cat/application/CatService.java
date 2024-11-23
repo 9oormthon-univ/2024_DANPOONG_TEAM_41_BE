@@ -8,6 +8,7 @@ import com.allgoing.domain.cat.dto.request.PatchCatItemRequest;
 import com.allgoing.domain.cat.dto.response.CatItemListResponse;
 import com.allgoing.domain.cat.dto.response.CatItemResponse;
 import com.allgoing.domain.cat.dto.response.ExpResponse;
+import com.allgoing.domain.user.domain.User;
 import com.allgoing.domain.user.domain.repository.UserRepository;
 import com.allgoing.global.config.security.token.UserPrincipal;
 import com.allgoing.global.payload.ApiResponse;
@@ -124,8 +125,8 @@ public class CatService {
     }
 
     private Cat getCatbyUser(UserPrincipal userPrincipal) {
-        // User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        // return catRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
-        return catRepository.findByUserId(1L).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+        User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        return catRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+
     }
 }

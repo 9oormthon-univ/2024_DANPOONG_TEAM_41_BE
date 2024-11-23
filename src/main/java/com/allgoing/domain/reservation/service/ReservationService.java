@@ -17,6 +17,7 @@ import com.allgoing.domain.store.domain.Store;
 import com.allgoing.domain.store.repository.StoreRepository;
 import com.allgoing.domain.user.domain.User;
 import com.allgoing.domain.user.domain.repository.UserRepository;
+import com.allgoing.global.config.security.token.UserPrincipal;
 import com.allgoing.global.error.DefaultException;
 import com.allgoing.global.payload.ErrorCode;
 import jakarta.persistence.EntityNotFoundException;
@@ -37,14 +38,16 @@ public class ReservationService {
     private final CatRepository catRepository;
 
     @Transactional
-    public void makeReservation(ReservationRequest reservationRequest, Long storeId, Long userId) {
+    public void makeReservation(ReservationRequest reservationRequest, Long storeId, UserPrincipal userPrincipal) {
         // Store 가져오기
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 가게 없음: " + storeId));
 
-        // User 가져오기
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 유저 없음: " + userId));
+        User user = getUser(userPrincipal);
+
+//        // User 가져오기
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 유저 없음: " + userId));
 
         // Reservation 생성 및 설정
         Reservation reservation = Reservation.builder()
@@ -68,12 +71,14 @@ public class ReservationService {
     }
 
     @Transactional
-    public void cancelReservation(Long reservationId, Long userId) {
+    public void cancelReservation(Long reservationId, UserPrincipal userPrincipal) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 예약 없음 id: " + reservationId));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 유저 없음: " + userId));
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 유저 없음: " + userId));
+
+        User user = getUser(userPrincipal);
 
         if (!reservation.getUser().equals(user)) {
             throw new DefaultException(ErrorCode.INVALID_AUTHENTICATION, "예약 당사자만 취소 가능합니다");
@@ -83,12 +88,14 @@ public class ReservationService {
     }
 
     @Transactional
-    public List<ReservationResponse> getMyReservations(Long userId) {
+    public List<ReservationResponse> getMyReservations(UserPrincipal userPrincipal) {
         // User 가져오기
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 유저 없음: " + userId));
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 유저 없음: " + userId));
 
-        List<Reservation> reservations = reservationRepository.findAllByUserId(userId);
+        User user = getUser(userPrincipal);
+
+        List<Reservation> reservations = reservationRepository.findAllByUserId(user.getId());
         List<ReservationResponse> responses = new ArrayList<>();
 
         for (Reservation reservation : reservations) {
@@ -130,18 +137,20 @@ public class ReservationService {
     }
 
     @Transactional
-    public ExpResponse visitReservation(Long reservationId, Long userId) {
+    public ExpResponse visitReservation(Long reservationId, UserPrincipal userPrincipal) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 예약 없음 id: " + reservationId));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 유저 없음: " + userId));
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new EntityNotFoundException("해당 ID에 맞는 유저 없음: " + userId));
+
+        User user = getUser(userPrincipal);
 
         reservation.setReservationStatus(ReservationStatus.DONE);
         reservationRepository.save(reservation);
 
         //고양이 경험치 증가 로직
-        Cat cat = catRepository.findByUserId(userId).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+        Cat cat = catRepository.findByUserId(user.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
 
         catService.plusExp(cat, 3L);
 
@@ -172,6 +181,12 @@ public class ReservationService {
                 .storeName(reservation.getStore().getStoreName())
                 .products(products)
                 .build();
+    }
+
+
+    private User getUser(UserPrincipal userPrincipal) {
+        return userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 
 

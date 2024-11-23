@@ -19,6 +19,7 @@ import com.allgoing.domain.traditional.domain.Traditional;
 import com.allgoing.domain.traditional.repository.TraditionalRepository;
 import com.allgoing.domain.user.domain.User;
 import com.allgoing.domain.user.domain.repository.UserRepository;
+import com.allgoing.global.config.security.token.UserPrincipal;
 import com.allgoing.global.error.DefaultException;
 import com.allgoing.global.payload.ErrorCode;
 import com.allgoing.global.util.S3Util;
@@ -48,7 +49,7 @@ public class ReviewService {
 
     //리뷰 등록
     @Transactional
-    public ExpResponse createReview(ReviewRequestDto.Review review, Long userId, Long storeId, List<MultipartFile> files) {
+    public ExpResponse createReview(ReviewRequestDto.Review review, UserPrincipal userPrincipal, Long storeId, List<MultipartFile> files) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 가게 정보 없음 id: " + storeId));
 
@@ -61,8 +62,10 @@ public class ReviewService {
             store.setStar(newAvg);
         }
 
+        User user = getUser(userPrincipal);
+
         Review newReview = Review.builder()
-                .user(userRepository.getById(userId))
+                .user(user)
                 .reviewTitle(review.getReviewTitle())
                 .reviewContent(review.getReviewContent())
                 .store(store)
@@ -89,7 +92,7 @@ public class ReviewService {
         }
 
         //고양이 경험치 증가 로직
-        Cat cat = catRepository.findByUserId(userId).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+        Cat cat = catRepository.findByUserId(user.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
 
         catService.plusExp(cat, 3L);
 
@@ -104,11 +107,13 @@ public class ReviewService {
 
     //리뷰삭제
     @Transactional
-    public void deleteReview(Long reviewId, Long userId) {
+    public void deleteReview(Long reviewId, UserPrincipal userPrincipal) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 리뷰 없음 id: " + reviewId));
 
-        if (!review.getUser().equals(userRepository.getById(userId))) {
+        User user = getUser(userPrincipal);
+
+        if (!review.getUser().equals(user)) {
             throw new DefaultException(ErrorCode.INVALID_AUTHENTICATION, "리뷰 작성자만 삭제 가능합니다");
         }
 
@@ -142,14 +147,15 @@ public class ReviewService {
 
 
     @Transactional
-    public ReviewDto detailReview(Long reviewId, Long userId) {
+    public ReviewDto detailReview(Long reviewId, UserPrincipal userPrincipal) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 리뷰 없음 id: " + reviewId));
 
-        // User 가져오기
-        User user = userRepository.findById(review.getUser().getId())
-                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 "));
+//        // User 가져오기
+//        User user = userRepository.findById(review.getUser().getId())
+//                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 "));
 
+        User user = getUser(userPrincipal);
 
         return ReviewDto.builder()
                 .reviewId(review.getReviewId())
@@ -173,12 +179,14 @@ public class ReviewService {
     }
 
     @Transactional
-    public List<ReviewDto> traditionalReview(Long traditionalId, Long userId) {
+    public List<ReviewDto> traditionalReview(Long traditionalId, UserPrincipal userPrincipal) {
         Traditional traditional = traditionalRepository.findById(traditionalId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 전통시장 없음 id: " + traditionalId));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
+
+        User user = getUser(userPrincipal);
 
         List<Store> stores = traditional.getStore();
         List<ReviewDto> reviewDtos = new ArrayList<>();
@@ -209,11 +217,13 @@ public class ReviewService {
     }
 
     @Transactional
-    public List<ReviewDto> myReview(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
+    public List<ReviewDto> myReview(UserPrincipal userPrincipal) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
 
-        List<ReviewDto> ReviewDtoList = reviewRepository.findAllByUserId(userId).stream()
+        User user = getUser(userPrincipal);
+
+        List<ReviewDto> ReviewDtoList = reviewRepository.findAllByUserId(user.getId()).stream()
                 .map(review -> ReviewDto.builder()
                         .reviewTitle(review.getReviewTitle())
                         .reviewContent(review.getReviewContent())
@@ -238,13 +248,15 @@ public class ReviewService {
 
 
     @Transactional
-    public void likeReview(Long reviewId, Long userId) {
+    public void likeReview(Long reviewId, UserPrincipal userPrincipal) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 리뷰 없음 id: " + reviewId));
 
         // User 가져오기
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
+
+        User user = getUser(userPrincipal);
 
         // 이미 좋아요한 경우 예외 처리
         if (reviewLikeRepository.existsByReviewAndUser(review, user)) {
@@ -261,12 +273,14 @@ public class ReviewService {
     }
 
     @Transactional
-    public void unlikeReview(Long reviewId, Long userId) {
+    public void unlikeReview(Long reviewId, UserPrincipal userPrincipal) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 리뷰 없음 id: " + reviewId));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
+
+        User user = getUser(userPrincipal);
 
         // 좋아요 기록 찾기
         ReviewLike reviewLike = reviewLikeRepository.findByReviewAndUser(review, user)
@@ -281,11 +295,13 @@ public class ReviewService {
     }
 
     @Transactional
-    public List<ReviewDto> likeReviewList(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
+    public List<ReviewDto> likeReviewList(UserPrincipal userPrincipal) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new EntityNotFoundException("해당 id에 맞는 유저 없음 id: " + userId));
 
-        List<ReviewDto> allLikeReview = reviewLikeRepository.findAllByUserId(userId).stream()
+        User user = getUser(userPrincipal);
+
+        List<ReviewDto> allLikeReview = reviewLikeRepository.findAllByUserId(user.getId()).stream()
                 .map(reviewLike -> ReviewDto.builder()
                         .reviewTitle(reviewLike.getReview().getReviewTitle())
                         .reviewContent(reviewLike.getReview().getReviewContent())
@@ -305,6 +321,11 @@ public class ReviewService {
                                         .build()).toList())
                         .build()).toList();
         return allLikeReview;
+    }
+
+    private User getUser(UserPrincipal userPrincipal) {
+        return userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 
 //    public List<Review> allReiews() {
