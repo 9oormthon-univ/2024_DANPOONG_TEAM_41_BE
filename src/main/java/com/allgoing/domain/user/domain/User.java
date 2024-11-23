@@ -43,6 +43,9 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @OneToOne(mappedBy = "user")
+    private Cat cat;
+
     @OneToMany(mappedBy = "user")
     private List<Review> reviews = new ArrayList<>();
 
@@ -59,13 +62,13 @@ public class User extends BaseEntity {
     private List<Reservation> reservations = new ArrayList<>();
 
     @Builder
-    public User(String name, String email, String password, Provider provider, String profileImage) {
+    public User(String name, String email, String password, Provider provider, String profileImage, Role role) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.provider = provider;
         this.profileImage = profileImage;
-        this.role = Role.USER;
+        this.role = role;
     }
 
 }

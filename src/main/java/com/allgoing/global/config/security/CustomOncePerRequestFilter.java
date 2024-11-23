@@ -43,8 +43,17 @@ public class CustomOncePerRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        // 특정 엔드포인트는 필터 제외 (JWT 인증 건너뜀)
+        String requestUri = request.getRequestURI();
+        if ("/auth/idTokenLogin".equals(requestUri)) {
+            log.info("Skipping JWT authentication for URI: {}", requestUri);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String jwt = getJwtFromRequest(request);
-        log.info("Incoming request to [{}], JWT: {}", request.getRequestURI(), jwt);
+        log.info("Incoming request to [{}], JWT: {}", requestUri, jwt);
 
         if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {

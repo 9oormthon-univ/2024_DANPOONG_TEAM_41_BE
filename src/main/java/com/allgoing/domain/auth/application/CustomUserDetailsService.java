@@ -25,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     public UserDetails loadUserByName(String name) throws UsernameNotFoundException {
         log.info("Searching for user by name: {}", name);
-        return userRepository.findByName(name)
+        return userRepository.findByEmail(name)
                 .map(user -> {
                     log.info("User found: {}", user);
                     return UserPrincipal.create(user);
