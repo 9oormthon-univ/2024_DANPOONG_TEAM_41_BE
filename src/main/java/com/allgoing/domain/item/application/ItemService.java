@@ -15,6 +15,8 @@ import com.allgoing.domain.user.domain.repository.UserRepository;
 import com.allgoing.global.config.security.token.UserPrincipal;
 import com.allgoing.global.payload.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 @Transactional(readOnly = true)
 public class ItemService {
 
+    private static final Logger log = LoggerFactory.getLogger(ItemService.class);
     private final CatRepository catRepository;
     private final ItemRepository itemRepository;
     private final CatItemRepository catItemRepository;
@@ -124,8 +127,12 @@ public class ItemService {
 
 
     private Cat getCatbyUser(UserPrincipal userPrincipal) {
-        User user = userRepository.findById(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        return catRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new IllegalArgumentException("캐릭터를 찾을 수 없습니다."));
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found with Id: " + userPrincipal.getId()));
+        log.info("user: {}", user.getId());
+        return catRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Cat not found with User: " + user));
     }
+
 
 }
