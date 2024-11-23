@@ -64,10 +64,7 @@ public class IdTokenVerifier {
                     throw new IllegalArgumentException("ID 토큰의 이메일과 요청된 이메일이 일치하지 않습니다.");
                 }
 
-
-                String nickname = userInfo.path("properties").path("nickname").asText();
-                log.info("Kakao nickname: {}", nickname);
-                return nickname;
+                return tokenEmail;
             } else {
                 logger.error("ID 토큰 검증 실패: HTTP 상태 " + response.getStatusCode());
                 throw new RuntimeException("ID 토큰 검증 실패");
