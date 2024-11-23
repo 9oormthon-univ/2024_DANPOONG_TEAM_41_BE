@@ -57,9 +57,14 @@ public class ReviewService {
             int reviewNum = store.getStoreReviews().size();
             double starAvg = store.getStar() != null ? store.getStar() : 0.0;
 
-            // 별점 평균 계산
-            double newAvg = (starAvg * reviewNum + review.getStar()) / (reviewNum + 1);
-            store.setStar(newAvg);
+            if (reviewNum == 0) {
+                // 첫 리뷰인 경우, 별점을 직접 설정
+                store.setStar((double) review.getStar());
+            } else {
+                // 별점 평균 계산
+                double newAvg = (starAvg * reviewNum + review.getStar()) / (reviewNum + 1);
+                store.setStar(newAvg);
+            }
         }
 
         User user = getUser(userPrincipal);
@@ -119,18 +124,18 @@ public class ReviewService {
 
         Store store = review.getStore();
 
-        //별점 업데이트
+        // 별점 업데이트
         synchronized (store) {
             int reviewCount = store.getStoreReviews().size();
             double currentStarAvg = store.getStar() != null ? store.getStar() : 0.0;
 
-            //새로운 평균 계산
-            if (reviewCount > 1) {
-                double newStarAvg = (currentStarAvg * reviewCount - review.getStar()) / (reviewCount - 1);
-                store.setStar(newStarAvg);
-            } else {
+            if (reviewCount == 1) {
                 // 마지막 리뷰 삭제 시 별점 초기화
                 store.setStar(0.0);
+            } else if (reviewCount > 1) {
+                // 새로운 평균 계산
+                double newStarAvg = (currentStarAvg * reviewCount - review.getStar()) / (reviewCount - 1);
+                store.setStar(newStarAvg);
             }
         }
 
